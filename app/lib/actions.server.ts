@@ -338,11 +338,12 @@ export const nodeAction = async ({ request }: ActionArgs) => {
             id: "number",
             reason: "string",
           });
+
           if (formData instanceof Response) {
             return formData;
           }
 
-          requestReportNode(formData.id, formData.reason);
+          await requestReportNode(formData.id, formData.reason);
         }
         break;
     }

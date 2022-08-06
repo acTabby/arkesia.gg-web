@@ -52,15 +52,16 @@ export default function NodeDetails() {
   const toggleDiscoveredNode = useToggleDiscoveredNode();
   const drawerPosition = useDrawerPosition();
   const [searchParams, setSearchParams] = useSearchParams();
+  const nodeLocation = useEditingNodeLocation();
 
   useEffect(() => {
-    if (
-      transition.state === "submitting" &&
-      transition.submission.method === "DELETE"
-    ) {
+    if (nodeLocation) {
+      return;
+    }
+    if (transition.state === "submitting") {
       notificationId.current = notifications.showNotification({
         loading: true,
-        title: "Submitting deletion request",
+        title: userToken ? "Submitting deletion request" : "Reporting issue",
         message: "",
         autoClose: false,
         disallowClose: true,
@@ -76,7 +77,7 @@ export default function NodeDetails() {
       } else {
         notifications.updateNotification(notificationId.current, {
           id: notificationId.current,
-          title: userToken ? "Node deleted 💀" : "Submitted for deletion 💀",
+          title: userToken ? "Node deleted 💀" : "Issue reported",
           message: "",
         });
         notificationId.current = null;
@@ -204,7 +205,11 @@ export default function NodeDetails() {
                       value={selectedNodeLocation.id}
                     />
                     <input type="hidden" name="userToken" value={userToken} />
-                    <Button type="submit" color="red">
+                    <Button
+                      type="submit"
+                      color="red"
+                      loading={transition.state !== "idle"}
+                    >
                       Delete
                     </Button>
                     <Button
@@ -236,7 +241,11 @@ export default function NodeDetails() {
                       name="reason"
                       required
                     />
-                    <Button type="submit" color="teal">
+                    <Button
+                      type="submit"
+                      color="teal"
+                      loading={transition.state !== "idle"}
+                    >
                       Report issue
                     </Button>
                   </Form>

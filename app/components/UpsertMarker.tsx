@@ -51,6 +51,9 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
   const drawerPosition = useDrawerPosition();
 
   useEffect(() => {
+    if (!nodeLocation) {
+      return;
+    }
     if (
       transition.state === "submitting" &&
       transition.submission?.method === "POST"
