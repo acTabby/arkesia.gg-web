@@ -5367,7 +5367,7 @@ export const continents: Continent[] = [
             id: 0,
             tile: "cave_of_sin/lv_fat_caves_d_ps_0_{y}x{x}.webp",
             full: "cave_of_sin/lv_fat_caves_d_ps_0_full.webp",
-            max: [6, 6],
+            max: [5, 5],
           },
         ],
       },
