@@ -6392,34 +6392,10 @@ export const continents: Continent[] = [
         category: "Continent",
         tiles: [
           {
-            id: 0,
-            tile: "orehas_well/lv_pap_orehaw_d_ps_0_{y}x{x}.webp",
-            full: "orehas_well/lv_pap_orehaw_d_ps_0_full.webp",
-            max: [1, 1],
-          },
-          {
             id: 1,
             tile: "orehas_well/lv_pap_orehaw_d_ps_1_{y}x{x}.webp",
             full: "orehas_well/lv_pap_orehaw_d_ps_1_full.webp",
             max: [4, 8],
-          },
-          {
-            id: 2,
-            tile: "orehas_well/lv_pap_orehaw_d_ps_2_{y}x{x}.webp",
-            full: "orehas_well/lv_pap_orehaw_d_ps_2_full.webp",
-            max: [1, 1],
-          },
-          {
-            id: 5,
-            tile: "orehas_well/lv_pap_orehaw_d_ps_5_{y}x{x}.webp",
-            full: "orehas_well/lv_pap_orehaw_d_ps_5_full.webp",
-            max: [1, 1],
-          },
-          {
-            id: 6,
-            tile: "orehas_well/lv_pap_orehaw_d_ps_6_{y}x{x}.webp",
-            full: "orehas_well/lv_pap_orehaw_d_ps_6_full.webp",
-            max: [3, 3],
           },
         ],
       },
