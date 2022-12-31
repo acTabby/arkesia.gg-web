@@ -1,12 +1,10 @@
 import { Button, Group, Text } from "@mantine/core";
 import { useLocalStorage } from "@mantine/hooks";
-import { useNotifications } from "@mantine/notifications";
+import { hideNotification, showNotification } from "@mantine/notifications";
 import { useEffect } from "react";
 import { trackOutboundLinkClick } from "~/lib/stats";
 
 const Notifications = () => {
-  const notifications = useNotifications();
-
   const [hasContributorsSeen, setHasContributorsSeen] = useLocalStorage({
     key: "hasContributorsSeen",
     defaultValue: false,
@@ -16,8 +14,8 @@ const Notifications = () => {
     if (hasContributorsSeen) {
       return;
     }
-    setTimeout(() => {
-      notifications.showNotification({
+    const timeoutId = setTimeout(() => {
+      showNotification({
         id: "hasContributorsSeen",
         title: "Join the team",
         message: (
@@ -44,7 +42,7 @@ const Notifications = () => {
                 compact
                 onClick={() => {
                   setHasContributorsSeen(true);
-                  notifications.hideNotification("hasContributorsSeen");
+                  hideNotification("hasContributorsSeen");
                 }}
               >
                 Do not show again
@@ -55,7 +53,10 @@ const Notifications = () => {
         autoClose: false,
       });
     }, 5000);
-  }, []);
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [hasContributorsSeen]);
 
   return <></>;
 };

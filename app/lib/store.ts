@@ -1,6 +1,6 @@
 import type { AreaNode, AreaNodeLocation } from "@prisma/client";
+import { useSearchParams } from "@remix-run/react";
 import { useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
 import create from "zustand";
 import { persist } from "zustand/middleware";
 import { useNodeLocations } from "./loaders";

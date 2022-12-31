@@ -22,11 +22,11 @@ export const uploadNodeScreenshot = async (
   buffer: Buffer
 ) => {
   const bucket = supabase.storage.from("nodes");
-  const { data, error } = await bucket.upload(filename, buffer);
-  if (error || !data?.Key) {
+  const { error } = await bucket.upload(filename, buffer);
+  if (error) {
     throw error;
   }
-  return bucket.getPublicUrl(filename).publicURL;
+  return bucket.getPublicUrl(filename).data.publicUrl;
 };
 
 export const deleteNodeScreenshot = async (publicUrl: string) => {

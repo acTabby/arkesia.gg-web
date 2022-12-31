@@ -1,5 +1,4 @@
 import { SpotlightProvider, useSpotlight } from "@mantine/spotlight";
-import { MagnifyingGlassIcon } from "@modulz/radix-icons";
 import type { MouseEvent, ReactNode } from "react";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -14,7 +13,6 @@ import {
   TILE_BASE_URL,
   world,
 } from "~/lib/static";
-import { useNavigate } from "react-router-dom";
 import { useLastAreaNames } from "~/lib/store";
 import {
   Center,
@@ -29,6 +27,8 @@ import { useDidUpdate, useHotkeys } from "@mantine/hooks";
 import { searchNodesByName } from "~/lib/supabase";
 import useThrottle from "~/lib/useThrottle";
 import type { TransitTo } from "~/lib/types";
+import { IconSearch } from "@tabler/icons";
+import { useNavigate } from "@remix-run/react";
 
 type AppSpotlightProviderProps = {
   children: ReactNode;
@@ -62,8 +62,11 @@ export default function AppSpotlightProvider({
   return (
     <SpotlightProvider
       actions={actions}
-      searchIcon={<MagnifyingGlassIcon />}
+      searchIcon={<IconSearch />}
       searchPlaceholder="Search for areas and nodes..."
+      searchInputProps={{
+        autoComplete: "off",
+      }}
       shortcut="ctrl + f"
       nothingFoundMessage="Nothing found..."
       zIndex={10000}
@@ -92,7 +95,7 @@ export default function AppSpotlightProvider({
 
 function ActionsWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <ScrollArea style={{ maxHeight: "70vh", height: "100%" }}>
+    <ScrollArea style={{ maxHeight: "70vh", height: "calc(100% - 50px)" }}>
       {children}
     </ScrollArea>
   );
@@ -211,7 +214,7 @@ const useStyles = createStyles((theme) => ({
   },
 
   actionBody: {
-    flex: 1,
+    flex: "1 !important",
   },
 }));
 

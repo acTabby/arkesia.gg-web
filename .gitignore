@@ -9,6 +9,7 @@ node_modules
 /api/index.js
 /api/index.js.map
 /api/_build
+/api/_assets
 
 .env
 # Supabase

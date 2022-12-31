@@ -9,11 +9,14 @@ import {
   Title,
   Stack,
 } from "@mantine/core";
-import { useDidUpdate, useLocalStorageValue } from "@mantine/hooks";
-import { useNotifications } from "@mantine/notifications";
-import { EyeClosedIcon, EyeOpenIcon } from "@modulz/radix-icons";
-import { useEffect, useRef } from "react";
-import { Form, useActionData, useTransition } from "@remix-run/react";
+import { useDidUpdate, useLocalStorage } from "@mantine/hooks";
+import {
+  Form,
+  useActionData,
+  useLocation,
+  useSearchParams,
+  useTransition,
+} from "@remix-run/react";
 import {
   useDiscoveredNodes,
   useDrawerPosition,
@@ -26,13 +29,12 @@ import {
 import { AvailableNodes } from "./AvailableNodes";
 import ImagePreview from "./ImagePreview";
 import NodeDescription from "./NodeDescription";
-import type { URLSearchParamsInit } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
 import { ClientOnly } from "remix-utils";
 import IslandGuideLink from "./IslandGuideLink";
 import ShareButton from "./ShareButton";
 import type { nodeAction } from "~/lib/actions.server";
+import { IconEye, IconEyeOff } from "@tabler/icons";
+import { showNotification, updateNotification } from "@mantine/notifications";
 
 export default function NodeDetails() {
   const location = useLocation();
@@ -42,45 +44,43 @@ export default function NodeDetails() {
   const setEditingNodeLocation = useSetEditingNodeLocation();
   const transition = useTransition();
   const actionData = useActionData<typeof nodeAction>();
-  const [userToken] = useLocalStorageValue<string>({
+  const [userToken] = useLocalStorage<string>({
     key: "user-token",
     defaultValue: "",
   });
-  const notifications = useNotifications();
-  const notificationId = useRef<string | null>(null);
   const discoveredNodes = useDiscoveredNodes();
   const toggleDiscoveredNode = useToggleDiscoveredNode();
   const drawerPosition = useDrawerPosition();
   const [searchParams, setSearchParams] = useSearchParams();
   const nodeLocation = useEditingNodeLocation();
 
-  useEffect(() => {
+  useDidUpdate(() => {
     if (nodeLocation) {
       return;
     }
     if (transition.state === "submitting") {
-      notificationId.current = notifications.showNotification({
+      showNotification({
+        id: "notification",
         loading: true,
         title: userToken ? "Submitting deletion request" : "Reporting issue",
         message: "",
         autoClose: false,
         disallowClose: true,
       });
-    } else if (transition.state === "idle" && notificationId.current) {
+    } else if (transition.state === "idle") {
       if (actionData) {
-        notifications.updateNotification(notificationId.current, {
-          id: notificationId.current,
+        updateNotification({
+          id: "notification",
           title: "Something is wrong",
           message: "",
           color: "red",
         });
       } else {
-        notifications.updateNotification(notificationId.current, {
-          id: notificationId.current,
+        updateNotification({
+          id: "notification",
           title: userToken ? "Node deleted 💀" : "Issue reported",
           message: "",
         });
-        notificationId.current = null;
         setSelectedNodeLocation(null);
       }
     }
@@ -88,7 +88,7 @@ export default function NodeDetails() {
   }, [transition.state, actionData, transition.submission?.method]);
 
   useDidUpdate(() => {
-    const newSearchParams: URLSearchParamsInit = {};
+    const newSearchParams: Parameters<typeof setSearchParams>[0] = {};
     const tileId = searchParams.get("tileId");
     if (tileId) {
       newSearchParams.tileId = tileId;
@@ -175,11 +175,11 @@ export default function NodeDetails() {
                         discoveredNode.id === selectedNodeLocation.areaNodeId
                     ) ? (
                       <>
-                        <EyeClosedIcon /> Discovered
+                        <IconEyeOff /> Discovered
                       </>
                     ) : (
                       <>
-                        <EyeOpenIcon />
+                        <IconEye />
                         Not discovered
                       </>
                     )

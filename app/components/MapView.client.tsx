@@ -7,8 +7,6 @@ import includeCanvasTileLayer from "./includeCanvasTileLayer";
 import TileControl from "./TileControl";
 import { getBounds, getMapCenter } from "~/lib/map";
 import UpsertMarker from "./UpsertMarker";
-import { useParams } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
 import { useDidUpdate } from "@mantine/hooks";
 import {
   useLastAreaNames,
@@ -20,6 +18,7 @@ import {
 } from "~/lib/store";
 import { useNodeLocations } from "~/lib/loaders";
 import { arkesiaArea, continents } from "~/lib/static";
+import { useParams, useSearchParams } from "@remix-run/react";
 
 includeCanvasTileLayer();
 

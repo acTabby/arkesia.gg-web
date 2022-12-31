@@ -1,18 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Tooltip } from "react-leaflet";
-import { Form, useActionData, useTransition } from "@remix-run/react";
-import { useNotifications } from "@mantine/notifications";
+import {
+  Form,
+  useActionData,
+  useLocation,
+  useTransition,
+} from "@remix-run/react";
+import { showNotification, updateNotification } from "@mantine/notifications";
 import type { Area, Tile } from "~/lib/types";
 import {
   Anchor,
   Button,
   Drawer,
-  InputWrapper,
+  Input,
   ScrollArea,
   Text,
   TextInput,
 } from "@mantine/core";
-import { useLocalStorageValue } from "@mantine/hooks";
 import ImageDropzone from "./ImageDropzone";
 import type { PostNodeActionData } from "~/lib/validation";
 import RichTextEditor from "@mantine/rte";
@@ -25,7 +29,7 @@ import {
 } from "~/lib/store";
 import TypeSelect from "./TypeSelect";
 import { trackOutboundLinkClick } from "~/lib/stats";
-import { useLocation } from "react-router-dom";
+import { useLocalStorage } from "@mantine/hooks";
 
 type UpsertMarkerProps = {
   area: Area;
@@ -41,9 +45,7 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
   const [lastType, setLastType] = useLastType();
 
   const transition = useTransition();
-  const notifications = useNotifications();
-  const notificationId = useRef<string | null>(null);
-  const [userToken] = useLocalStorageValue<string>({
+  const [userToken] = useLocalStorage<string>({
     key: "user-token",
     defaultValue: "",
   });
@@ -58,28 +60,28 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
       transition.state === "submitting" &&
       transition.submission?.method === "POST"
     ) {
-      notificationId.current = notifications.showNotification({
+      showNotification({
+        id: "notification",
         loading: true,
         title: "Submitting node",
         message: "",
         autoClose: false,
         disallowClose: true,
       });
-    } else if (transition.state === "idle" && notificationId.current) {
+    } else if (transition.state === "idle") {
       if (actionData) {
-        notifications.updateNotification(notificationId.current, {
-          id: notificationId.current,
+        updateNotification({
+          id: "notification",
           title: "Something is wrong",
           message: "",
           color: "red",
         });
       } else {
-        notifications.updateNotification(notificationId.current, {
-          id: notificationId.current,
+        updateNotification({
+          id: "notification",
           title: userToken ? "Node added 🤘" : "Node added for review 🤘",
           message: "",
         });
-        notificationId.current = null;
         setFileScreenshot(null);
         setEditingNodeLocation(null);
       }
@@ -201,7 +203,7 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
                   name="name"
                   error={actionData?.fieldErrors?.name}
                 />
-                <InputWrapper
+                <Input.Wrapper
                   label="Description (optional)"
                   error={actionData?.fieldErrors?.description}
                 >
@@ -229,7 +231,7 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
                     value={nodeLocation.areaNode?.description || ""}
                     name="description"
                   />
-                </InputWrapper>
+                </Input.Wrapper>
                 <TextInput
                   label="Transit to node ID (optional)"
                   placeholder="Enter node ID"
@@ -260,7 +262,7 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
                     setFileScreenshot(null);
                   }}
                   onReject={() =>
-                    notifications.showNotification({
+                    showNotification({
                       title: "Upload failed",
                       message: "",
                       color: "red",

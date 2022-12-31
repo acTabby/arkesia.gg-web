@@ -11,11 +11,11 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import {
-  DrawingPinIcon,
-  GearIcon,
-  GitHubLogoIcon,
-  InfoCircledIcon,
-} from "@modulz/radix-icons";
+  IconBrandGithub,
+  IconInfoCircle,
+  IconMapPin,
+  IconSettings,
+} from "@tabler/icons";
 import { useState } from "react";
 import { trackOutboundLinkClick } from "~/lib/stats";
 import {
@@ -79,7 +79,7 @@ export default function ActionIcons() {
           aria-label="Propose a node"
           p={4}
         >
-          <DrawingPinIcon color="#ced4da" width="100%" height="100%" />
+          <IconMapPin color="#ced4da" width="100%" height="100%" />
         </ActionIcon>
       </Tooltip>
       <Tooltip zIndex={9100} label={<Text>Settings</Text>}>
@@ -89,7 +89,7 @@ export default function ActionIcons() {
           aria-label="Settings"
           p={4}
         >
-          <GearIcon color="#ced4da" width="100%" height="100%" />
+          <IconSettings color="#ced4da" width="100%" height="100%" />
         </ActionIcon>
       </Tooltip>
       <Tooltip zIndex={9100} label={<Text>Contribute or give feedback</Text>}>
@@ -104,7 +104,7 @@ export default function ActionIcons() {
             trackOutboundLinkClick("https://github.com/lmachens/arkesia.gg-web")
           }
         >
-          <GitHubLogoIcon color="#ced4da" width="100%" height="100%" />
+          <IconBrandGithub color="#ced4da" width="100%" height="100%" />
         </ActionIcon>
       </Tooltip>
       <Tooltip zIndex={9100} label={<Text>Join the community</Text>}>
@@ -152,29 +152,29 @@ export default function ActionIcons() {
         <Popover
           opened={opened}
           onClose={handlers.close}
-          target={
+          position="bottom"
+          withArrow
+          zIndex={8900}
+          radius="sm"
+        >
+          <Popover.Target>
             <ActionIcon
               onClick={handlers.toggle}
               size="lg"
               variant="filled"
               title="Actions"
               color="cyan"
+              sx={{
+                display: "none",
+                "@media (max-width: 800px)": {
+                  display: "block",
+                },
+              }}
             >
-              <InfoCircledIcon />
+              <IconInfoCircle />
             </ActionIcon>
-          }
-          position="bottom"
-          withArrow
-          zIndex={8900}
-          radius="sm"
-          sx={{
-            display: "none",
-            "@media (max-width: 800px)": {
-              display: "block",
-            },
-          }}
-        >
-          {content}
+          </Popover.Target>
+          <Popover.Dropdown>{content}</Popover.Dropdown>
         </Popover>
       </MediaQuery>
       <MediaQuery largerThan="sm" styles={css}>

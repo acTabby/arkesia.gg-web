@@ -1,7 +1,6 @@
 import { Image } from "@mantine/core";
 import { useEffect, useMemo, useRef } from "react";
 import { TileLayer, useMapEvents } from "react-leaflet";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import { getBounds } from "~/lib/map";
 import { nodeTypesMap, TILE_BASE_URL } from "~/lib/static";
 import {
@@ -13,6 +12,7 @@ import {
 import type { Area, AreaNodeLocationDTO, Tile } from "~/lib/types";
 import L from "leaflet";
 import NodeLocationMarker from "./NodeLocationMarker";
+import { useNavigate, useSearchParams } from "@remix-run/react";
 
 type TileControlProps = {
   area: Area;
@@ -43,7 +43,7 @@ export default function TileControl({
         area.category === "World" ? L.point(980, 752) : 256;
       tileLayerRef.current.setUrl(`${TILE_BASE_URL}${activeTile.tile}`);
     }
-  }, [activeTile]);
+  }, [activeTile, area.category]);
   const drawerPosition = useDrawerPosition();
   const setSelectedNodeLocation = useSetSelectedNodeLocation();
   const filters = useFilters();

@@ -9,7 +9,12 @@ import {
 import type { ShouldReloadFunction } from "@remix-run/react";
 import styles from "~/styles/global.css";
 import leafletStyles from "leaflet/dist/leaflet.css";
-import { AppShell, Global, MantineProvider } from "@mantine/core";
+import {
+  AppShell,
+  Global,
+  MantineProvider,
+  createEmotionCache,
+} from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
 import AppSpotlightProvider from "./components/AppSpotlightProvider";
 import InitClients from "./components/InitClients";
@@ -19,6 +24,7 @@ import ActionIcons from "./components/ActionIcons";
 import Footer from "./components/Footer";
 import NitroPay from "./components/NitroPay";
 import Notifications from "./components/Notifications";
+import { StylesPlaceholder } from "@mantine/remix";
 
 export function links() {
   return [
@@ -42,20 +48,25 @@ export const loader = envLoader;
 // Only load `envLoader` once
 export const unstable_shouldReload: ShouldReloadFunction = () => false;
 
+createEmotionCache({ key: "mantine" });
+
 export default function App() {
   return (
-    <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <InitClients />
-        <MantineProvider
-          theme={{ fontFamily: "NunitoVariable", colorScheme: "dark" }}
-        >
+    <MantineProvider
+      theme={{ fontFamily: "NunitoVariable", colorScheme: "dark" }}
+      withGlobalStyles
+      withNormalizeCSS
+    >
+      <html lang="en">
+        <head>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width,initial-scale=1" />
+          <StylesPlaceholder />
+          <Meta />
+          <Links />
+        </head>
+        <body>
+          <InitClients />
           <Global
             styles={() => ({
               body: {
@@ -89,11 +100,11 @@ export default function App() {
               </AppShell>
             </AppSpotlightProvider>
           </NotificationsProvider>
-        </MantineProvider>
-        <ScrollRestoration />
-        <Scripts />
-        {process.env.NODE_ENV === "development" && <LiveReload />}
-      </body>
-    </html>
+          <ScrollRestoration />
+          <Scripts />
+          {process.env.NODE_ENV === "development" && <LiveReload />}
+        </body>
+      </html>
+    </MantineProvider>
   );
 }
