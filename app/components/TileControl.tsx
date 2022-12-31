@@ -1,5 +1,5 @@
 import { Image } from "@mantine/core";
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { TileLayer, useMapEvents } from "react-leaflet";
 import { getBounds } from "~/lib/map";
 import { nodeTypesMap, TILE_BASE_URL } from "~/lib/static";
@@ -31,19 +31,10 @@ export default function TileControl({
   onNodeLocationClick,
   selectedNodeLocation,
 }: TileControlProps) {
-  const tileLayerRef = useRef<L.TileLayer | null>(null);
   const navigate = useNavigate();
   const editingNodeLocation = useEditingNodeLocation();
   const [, setSearchParams] = useSearchParams();
 
-  useEffect(() => {
-    if (tileLayerRef.current) {
-      tileLayerRef.current.options.bounds = getBounds(activeTile);
-      tileLayerRef.current.options.tileSize =
-        area.category === "World" ? L.point(980, 752) : 256;
-      tileLayerRef.current.setUrl(`${TILE_BASE_URL}${activeTile.tile}`);
-    }
-  }, [activeTile, area.category]);
   const drawerPosition = useDrawerPosition();
   const setSelectedNodeLocation = useSetSelectedNodeLocation();
   const filters = useFilters();
@@ -97,7 +88,8 @@ export default function TileControl({
           ))}
       </div>
       <TileLayer
-        ref={tileLayerRef}
+        /* Set key to tell React to render a new TileLayer instead of updating the previous one */
+        key={activeTile.tile}
         url={`${TILE_BASE_URL}${activeTile.tile}`}
         minNativeZoom={2}
         maxNativeZoom={2}
