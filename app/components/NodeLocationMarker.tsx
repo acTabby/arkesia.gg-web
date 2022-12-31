@@ -1,6 +1,6 @@
 import { Text } from "@mantine/core";
+import { useNavigate } from "@remix-run/react";
 import { Tooltip } from "react-leaflet";
-import { useNavigate } from "react-router-dom";
 import { areaContinents } from "~/lib/static";
 import {
   useDiscoveredNodes,

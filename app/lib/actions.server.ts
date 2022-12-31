@@ -201,7 +201,7 @@ export const nodeAction = async ({ request }: ActionArgs) => {
           ) as NodeOnDiskFile | null;
           const createdNode = await requestCreateNode(node, fileScreenshot);
 
-          if (createdNode instanceof Response) {
+          if (!("id" in createdNode)) {
             return createdNode;
           }
 
@@ -289,7 +289,7 @@ export const nodeAction = async ({ request }: ActionArgs) => {
             "fileScreenshot"
           ) as NodeOnDiskFile | null;
           const createdNode = await requestUpdateNode(node, fileScreenshot);
-          if (createdNode instanceof Response) {
+          if (!("id" in createdNode)) {
             return createdNode;
           }
 

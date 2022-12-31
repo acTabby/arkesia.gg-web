@@ -1,5 +1,5 @@
 import {
-  InputWrapper,
+  Input,
   SegmentedControl,
   Slider,
   Space,
@@ -7,7 +7,7 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { useLocalStorageValue } from "@mantine/hooks";
+import { useLocalStorage } from "@mantine/hooks";
 import { useEffect } from "react";
 import {
   useDrawerPosition,
@@ -20,7 +20,7 @@ import {
 import { DiscoveredNodes } from "./DiscoveredNodes";
 
 const Settings = () => {
-  const [userToken, setUserToken] = useLocalStorageValue<string>({
+  const [userToken, setUserToken] = useLocalStorage<string>({
     key: "user-token",
     defaultValue: "",
   });
@@ -58,7 +58,7 @@ const Settings = () => {
         checked={showNameOnMap}
         onChange={toggleShowNameOnMap}
       />
-      <InputWrapper label="Marker size" style={{ marginTop: 5 }}>
+      <Input.Wrapper label="Marker size" style={{ marginTop: 5 }}>
         <Slider
           value={markerSize}
           onChange={setMarkerSize}
@@ -66,7 +66,7 @@ const Settings = () => {
           max={60}
           label={null}
         />
-      </InputWrapper>
+      </Input.Wrapper>
       <Space h="md" />
       <DiscoveredNodes />
       <Text style={{ marginBottom: 10 }} weight={500}>

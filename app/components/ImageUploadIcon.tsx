@@ -1,22 +1,21 @@
-import type { DropzoneStatus } from "@mantine/dropzone";
-import { ImageIcon, UploadIcon, CrossCircledIcon } from "@modulz/radix-icons";
-import type { IconProps } from "@modulz/radix-icons/dist/types";
+import type { TablerIconProps } from "@tabler/icons";
+import { IconCircleX, IconPhoto, IconUpload } from "@tabler/icons";
 
 type ImageUploadIconProps = {
-  status: DropzoneStatus;
-} & IconProps;
+  status: "accepted" | "rejected" | "idle";
+} & TablerIconProps;
 
 export default function ImageUploadIcon({
   status,
   ...props
 }: ImageUploadIconProps) {
-  if (status.accepted) {
-    return <UploadIcon {...props} />;
+  if (status === "accepted") {
+    return <IconUpload {...props} />;
   }
 
-  if (status.rejected) {
-    return <CrossCircledIcon {...props} />;
+  if (status === "rejected") {
+    return <IconCircleX {...props} />;
   }
 
-  return <ImageIcon {...props} />;
+  return <IconPhoto {...props} />;
 }

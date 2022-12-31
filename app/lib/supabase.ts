@@ -13,7 +13,7 @@ export const initSupabase = (supabaseUrl: string, supabaseKey: string) => {
 
 export const searchNodesByName = async (query: string) => {
   const result = await supabase
-    .from<TransitTo>("AreaNode")
+    .from("AreaNode")
     .select(
       `
       id,
@@ -30,12 +30,12 @@ export const searchNodesByName = async (query: string) => {
     .neq("type", "Stairs (Down)")
     .ilike("name", `%${query}%`)
     .limit(10);
-  return result.data || [];
+  return (result.data || []) as TransitTo[];
 };
 
 export const countTypesByLocation = async (areaName: string) => {
   const result = await supabase
-    .from<AreaNodeLocationDTO>("AreaNodeLocation")
+    .from("AreaNodeLocation")
     .select(
       `
       areaNodeId,
@@ -45,7 +45,7 @@ export const countTypesByLocation = async (areaName: string) => {
     `
     )
     .eq("areaName", areaName);
-  const data = result.data || [];
+  const data = (result.data || []) as AreaNodeLocationDTO[];
   const ids: number[] = [];
   const typesCount: {
     type: string;
