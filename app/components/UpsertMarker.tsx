@@ -51,6 +51,7 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
   });
   const actionData = useActionData<PostNodeActionData>();
   const drawerPosition = useDrawerPosition();
+  const [prevState, setPrevState] = useState(transition.state);
 
   useEffect(() => {
     if (!nodeLocation) {
@@ -68,7 +69,8 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
         autoClose: false,
         disallowClose: true,
       });
-    } else if (transition.state === "idle") {
+      setPrevState(transition.state);
+    } else if (transition.state === "idle" && prevState !== "idle") {
       if (actionData) {
         updateNotification({
           id: "notification",
@@ -85,7 +87,9 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
         setFileScreenshot(null);
         setEditingNodeLocation(null);
       }
+      setPrevState(transition.state);
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transition.state, actionData, transition.submission?.method]);
 

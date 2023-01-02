@@ -24,11 +24,11 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { useDidUpdate, useHotkeys } from "@mantine/hooks";
-import { searchNodesByName } from "~/lib/supabase";
 import useThrottle from "~/lib/useThrottle";
 import type { TransitTo } from "~/lib/types";
 import { IconSearch } from "@tabler/icons";
-import { useNavigate } from "@remix-run/react";
+import { useNavigate, useOutletContext } from "@remix-run/react";
+import type { SupabaseContext } from "~/routes/__supabase";
 
 type AppSpotlightProviderProps = {
   children: ReactNode;
@@ -38,7 +38,6 @@ export default function AppSpotlightProvider({
   children,
 }: AppSpotlightProviderProps) {
   const navigate = useNavigate();
-
   useHotkeys([["ctrl+space", () => navigate(`/`)]]);
 
   const actions = useMemo(() => {
@@ -107,8 +106,31 @@ function AdditionalActions() {
   const spotlight = useSpotlight();
   const navigate = useNavigate();
   const query = useThrottle(spotlight.query, 200);
+  const { supabase } = useOutletContext<SupabaseContext>();
 
   useDidUpdate(() => {
+    const searchNodesByName = async (query: string) => {
+      const result = await supabase
+        .from("AreaNode")
+        .select(
+          `
+          id,
+          name,
+          type,
+          areaNodeLocations:AreaNodeLocation (
+            areaName,
+            tileId
+          )
+        `
+        )
+        .neq("type", "Map Transition")
+        .neq("type", "Stairs (Up)")
+        .neq("type", "Stairs (Down)")
+        .ilike("name", `%${query}%`)
+        .limit(10);
+      return (result.data || []) as TransitTo[];
+    };
+
     searchNodesByName(query).then(setNodes);
   }, [query]);
 

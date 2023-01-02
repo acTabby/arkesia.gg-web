@@ -34,6 +34,7 @@ import ShareButton from "./ShareButton";
 import type { nodeAction } from "~/lib/actions.server";
 import { IconEye, IconEyeOff } from "@tabler/icons";
 import { showNotification, updateNotification } from "@mantine/notifications";
+import { useState } from "react";
 
 export default function NodeDetails() {
   const location = useLocation();
@@ -52,6 +53,7 @@ export default function NodeDetails() {
   const drawerPosition = useDrawerPosition();
   const [searchParams, setSearchParams] = useSearchParams();
   const nodeLocation = useEditingNodeLocation();
+  const [prevState, setPrevState] = useState(transition.state);
 
   useDidUpdate(() => {
     if (nodeLocation) {
@@ -66,7 +68,8 @@ export default function NodeDetails() {
         autoClose: false,
         disallowClose: true,
       });
-    } else if (transition.state === "idle") {
+      setPrevState(transition.state);
+    } else if (transition.state === "idle" && prevState !== "idle") {
       if (actionData) {
         updateNotification({
           id: "notification",
@@ -82,6 +85,7 @@ export default function NodeDetails() {
         });
         setSelectedNodeLocation(null);
       }
+      setPrevState(transition.state);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transition.state, actionData, transition.submission?.method]);
@@ -113,8 +117,8 @@ export default function NodeDetails() {
         zIndex: 10950,
       }}
       title={
-        selectedNodeLocation?.areaNode.name ||
-        selectedNodeLocation?.areaNode.type
+        selectedNodeLocation?.areaNode?.name ||
+        selectedNodeLocation?.areaNode?.type
       }
       styles={{
         body: {

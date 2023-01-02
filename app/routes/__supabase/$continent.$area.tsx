@@ -1,16 +1,42 @@
-import { LoadingOverlay } from "@mantine/core";
-import type { HeadersFunction, MetaFunction } from "@remix-run/node";
+import { AppShell, LoadingOverlay } from "@mantine/core";
+import { NotificationsProvider } from "@mantine/notifications";
+import type {
+  HeadersFunction,
+  LoaderArgs,
+  MetaFunction,
+} from "@remix-run/node";
+import { json } from "@remix-run/node";
 import type { ShouldReloadFunction } from "@remix-run/react";
 import { ClientOnly } from "remix-utils";
+import ActionIcons from "~/components/ActionIcons";
+import AppBreadcrumbs from "~/components/AppBreadcrumbs";
+import AppSpotlightProvider from "~/components/AppSpotlightProvider";
 import FiltersSelect from "~/components/FiltersSelect";
+import Footer from "~/components/Footer";
 import MapView from "~/components/MapView.client";
+import NitroPay from "~/components/NitroPay";
 import NodeDetails from "~/components/NodeDetails";
+import Notifications from "~/components/Notifications";
 import { nodeAction } from "~/lib/actions.server";
-import { areaLoader } from "~/lib/loaders.server";
-import { continents } from "~/lib/static";
+import { findNodeLocations } from "~/lib/db.server";
+import { arkesiaArea, continents } from "~/lib/static";
 import type { AreaNodeLocationDTO } from "~/lib/types";
 
-export const loader = areaLoader;
+export const loader = async ({ params }: LoaderArgs) => {
+  const areaName = params.area || arkesiaArea.name;
+  const nodeLocations = await findNodeLocations({ areaName });
+
+  return json(
+    {
+      nodeLocations,
+    },
+    {
+      headers: {
+        "cache-control": "s-maxage=60, stale-while-revalidate",
+      },
+    }
+  );
+};
 export const action = nodeAction;
 
 export const meta: MetaFunction = ({ params, data, location }) => {
@@ -104,11 +130,36 @@ export const headers: HeadersFunction = () => {
 export default function WorldPage() {
   return (
     <>
-      <ClientOnly fallback={<LoadingOverlay visible />}>
-        {() => <MapView />}
-      </ClientOnly>
-      <NodeDetails />
-      <FiltersSelect />
+      <NotificationsProvider
+        zIndex={9000}
+        position="top-right"
+        autoClose={2500}
+      >
+        <AppSpotlightProvider>
+          <AppShell
+            padding={0}
+            style={{ overflow: "hidden" }}
+            styles={(theme) => ({
+              main: {
+                backgroundColor: theme.colors.dark[8],
+                color: theme.colors.dark[0],
+                height: "100vh",
+              },
+            })}
+          >
+            <AppBreadcrumbs />
+            <ClientOnly fallback={<LoadingOverlay visible />}>
+              {() => <MapView />}
+            </ClientOnly>
+            <NodeDetails />
+            <FiltersSelect />
+            <ActionIcons />
+            <Footer />
+            <NitroPay />
+            <Notifications />
+          </AppShell>
+        </AppSpotlightProvider>
+      </NotificationsProvider>
     </>
   );
 }
