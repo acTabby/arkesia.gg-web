@@ -134,8 +134,14 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
           setEditingNodeLocation(null);
           setFileScreenshot(null);
         }}
+        title={nodeLocation?.areaNode?.name || nodeLocation?.areaNode?.type}
+        styles={{
+          body: {
+            height: "calc(100% - 50px)",
+          },
+        }}
       >
-        <ScrollArea style={{ height: "calc(100% - 50px)" }}>
+        <ScrollArea style={{ height: "100%" }}>
           {nodeLocation?.position && (
             <>
               <Form

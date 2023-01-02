@@ -4,10 +4,9 @@ import {
   Group,
   ScrollArea,
   Space,
+  Stack,
   Text,
   TextInput,
-  Title,
-  Stack,
 } from "@mantine/core";
 import { useDidUpdate, useLocalStorage } from "@mantine/hooks";
 import {
@@ -113,14 +112,19 @@ export default function NodeDetails() {
         position: "relative",
         zIndex: 10950,
       }}
+      title={
+        selectedNodeLocation?.areaNode.name ||
+        selectedNodeLocation?.areaNode.type
+      }
+      styles={{
+        body: {
+          height: "calc(100% - 50px)",
+        },
+      }}
     >
-      <Stack style={{ height: "calc(100% - 50px)" }} spacing={0}>
+      <Stack style={{ height: "100%" }} spacing={0}>
         {selectedNodeLocation && (
           <>
-            <Title order={3}>
-              {selectedNodeLocation.areaNode.name ||
-                selectedNodeLocation.areaNode.type}
-            </Title>
             <Text color="teal">{selectedNodeLocation.areaNode.type}</Text>
             <Text size="xs">
               Node ID: {selectedNodeLocation.areaNodeId} Location ID:{" "}
