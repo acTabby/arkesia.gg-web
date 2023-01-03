@@ -133,6 +133,7 @@ export const insertUser = async (token: string) => {
   const user = await db.user.create({
     data: {
       token,
+      isModerator: false,
     },
   });
   return user;
