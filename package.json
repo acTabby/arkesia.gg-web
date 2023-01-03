@@ -5,6 +5,7 @@
   "license": "",
   "scripts": {
     "build": "cross-env NODE_ENV=production remix build",
+    "vercel-build": "prisma generate && remix build",
     "dev": "cross-env NODE_ENV=development node -r dotenv/config node_modules/.bin/remix dev"
   },
   "prisma": {
