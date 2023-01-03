@@ -10,21 +10,15 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import {
-  IconBrandGithub,
-  IconInfoCircle,
-  IconMapPin,
-  IconSettings,
-} from "@tabler/icons";
+import { IconInfoCircle, IconMapPin, IconSettings } from "@tabler/icons";
 import { useState } from "react";
-import { trackOutboundLinkClick } from "~/lib/stats";
 import {
   useDrawerPosition,
   useMap,
   useSetEditingNodeLocation,
 } from "~/lib/store";
-import { DiscordIcon } from "./DiscordIcon";
 import Settings from "./Settings";
+import User from "./User";
 
 export default function ActionIcons() {
   const [openedSettings, setOpenedSettings] = useState(false);
@@ -75,9 +69,11 @@ export default function ActionIcons() {
               });
             }
           }}
-          size="md"
+          size="lg"
           aria-label="Propose a node"
-          p={4}
+          p={6}
+          color="dark"
+          variant="filled"
         >
           <IconMapPin color="#ced4da" width="100%" height="100%" />
         </ActionIcon>
@@ -85,48 +81,18 @@ export default function ActionIcons() {
       <Tooltip zIndex={9100} label={<Text>Settings</Text>}>
         <ActionIcon
           onClick={() => setOpenedSettings((opened) => !opened)}
-          size="md"
+          size="lg"
           aria-label="Settings"
-          p={4}
+          p={6}
+          color="dark"
+          variant="filled"
         >
           <IconSettings color="#ced4da" width="100%" height="100%" />
         </ActionIcon>
       </Tooltip>
-      <Tooltip zIndex={9100} label={<Text>Contribute or give feedback</Text>}>
-        <ActionIcon
-          component="a"
-          href="https://github.com/lmachens/arkesia.gg-web"
-          target="_blank"
-          size="md"
-          aria-label="Contribute or give feedback"
-          p={4}
-          onClick={() =>
-            trackOutboundLinkClick("https://github.com/lmachens/arkesia.gg-web")
-          }
-        >
-          <IconBrandGithub color="#ced4da" width="100%" height="100%" />
-        </ActionIcon>
-      </Tooltip>
-      <Tooltip zIndex={9100} label={<Text>Join the community</Text>}>
-        <ActionIcon
-          component="a"
-          href="https://discord.com/invite/NTZu8Px"
-          target="_blank"
-          size="md"
-          sx={{
-            backgroundColor: "#5865f2",
-            "&:hover": {
-              backgroundColor: "#6974f3",
-            },
-          }}
-          aria-label="Join the community"
-          p={4}
-          onClick={() =>
-            trackOutboundLinkClick("https://discord.com/invite/NTZu8Px")
-          }
-        >
-          <DiscordIcon color="#ced4da" width="100%" height="100%" />
-        </ActionIcon>
+
+      <Tooltip zIndex={9100} label={<Text>Sign in</Text>}>
+        <User />
       </Tooltip>
       <Dialog
         opened={openedSettings}
@@ -171,7 +137,7 @@ export default function ActionIcons() {
                 },
               }}
             >
-              <IconInfoCircle />
+              <IconInfoCircle width="100%" />
             </ActionIcon>
           </Popover.Target>
           <Popover.Dropdown>{content}</Popover.Dropdown>
@@ -180,9 +146,7 @@ export default function ActionIcons() {
       <MediaQuery largerThan="sm" styles={css}>
         <Container
           sx={(theme) => ({
-            borderRadius: theme.radius.sm,
             padding: theme.spacing.xs,
-            backgroundColor: theme.colors.dark[8],
             "@media (max-width: 800px)": {
               display: "none",
             },

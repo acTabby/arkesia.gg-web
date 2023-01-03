@@ -23,17 +23,18 @@ import { arkesiaArea, continents } from "~/lib/static";
 import type { AreaNodeLocationDTO } from "~/lib/types";
 
 export const loader = async ({ params }: LoaderArgs) => {
+  const response = new Response();
+
   const areaName = params.area || arkesiaArea.name;
   const nodeLocations = await findNodeLocations({ areaName });
 
+  response.headers.set("cache-control", "s-maxage=60, stale-while-revalidate");
   return json(
     {
       nodeLocations,
     },
     {
-      headers: {
-        "cache-control": "s-maxage=60, stale-while-revalidate",
-      },
+      headers: response.headers,
     }
   );
 };

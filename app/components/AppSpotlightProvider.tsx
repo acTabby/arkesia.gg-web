@@ -27,8 +27,8 @@ import { useDidUpdate, useHotkeys } from "@mantine/hooks";
 import useThrottle from "~/lib/useThrottle";
 import type { TransitTo } from "~/lib/types";
 import { IconSearch } from "@tabler/icons";
-import { useNavigate, useOutletContext } from "@remix-run/react";
-import type { SupabaseContext } from "~/routes/__supabase";
+import { useNavigate } from "@remix-run/react";
+import useSupabase from "~/hooks/useSupabase";
 
 type AppSpotlightProviderProps = {
   children: ReactNode;
@@ -106,7 +106,7 @@ function AdditionalActions() {
   const spotlight = useSpotlight();
   const navigate = useNavigate();
   const query = useThrottle(spotlight.query, 200);
-  const { supabase } = useOutletContext<SupabaseContext>();
+  const { supabase } = useSupabase();
 
   useDidUpdate(() => {
     const searchNodesByName = async (query: string) => {

@@ -5,9 +5,7 @@ import {
   Space,
   Switch,
   Text,
-  TextInput,
 } from "@mantine/core";
-import { useLocalStorage } from "@mantine/hooks";
 import { useEffect } from "react";
 import {
   useDrawerPosition,
@@ -20,10 +18,6 @@ import {
 import { DiscoveredNodes } from "./DiscoveredNodes";
 
 const Settings = () => {
-  const [userToken, setUserToken] = useLocalStorage<string>({
-    key: "user-token",
-    defaultValue: "",
-  });
   const setDrawerPosition = useSetDrawerPosition();
   const showNameOnMap = useShowNameOnMap();
   const toggleShowNameOnMap = useToggleShowNameOnMap();
@@ -41,15 +35,6 @@ const Settings = () => {
 
   return (
     <>
-      <TextInput
-        label="User-Token"
-        required
-        placeholder="Only for moderators right now"
-        value={userToken}
-        onChange={(event) => setUserToken(event.target.value)}
-        name="userToken"
-      />
-      <Space h="md" />
       <Text style={{ marginBottom: 10 }} weight={500}>
         Map
       </Text>

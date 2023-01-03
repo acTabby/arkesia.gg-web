@@ -1,9 +1,8 @@
 import { Avatar, List, Skeleton } from "@mantine/core";
-import { useOutletContext } from "@remix-run/react";
 import { useEffect, useState } from "react";
+import useSupabase from "~/hooks/useSupabase";
 import { ICON_BASE_URL, nodeTypesMap } from "~/lib/static";
 import type { AreaNodeLocationDTO } from "~/lib/types";
-import type { SupabaseContext } from "~/routes/__supabase";
 
 type AvailableNodesProps = {
   areaName: string;
@@ -12,7 +11,7 @@ export function AvailableNodes({ areaName }: AvailableNodesProps) {
   const [typesCount, setTypesCount] = useState<
     { type: string; count: number }[] | null
   >(null);
-  const { supabase } = useOutletContext<SupabaseContext>();
+  const { supabase } = useSupabase();
 
   useEffect(() => {
     const countTypesByLocation = async (areaName: string) => {
