@@ -9,7 +9,7 @@ import {
   findNode,
   findNodeLocation,
   findNodeLocations,
-  findUser,
+  findOrCreateUser,
   insertNode,
   insertNodeLocation,
   updateNode,
@@ -34,6 +34,7 @@ import type {
   PostNodeActionData,
 } from "./validation";
 import { validateNode } from "./validation";
+import { createServerClient } from "./supabase.server";
 
 export function parseFormData<T extends {}>(
   body: FormData,
@@ -63,15 +64,6 @@ export function parseFormData<T extends {}>(
   }
   return result as T;
 }
-
-export async function requestUser(userToken?: string) {
-  if (!userToken) {
-    return null;
-  }
-  const user = await findUser(userToken);
-  return user;
-}
-
 export async function requestCreateNode(
   node: AreaNodeWithoutId,
   fileScreenshot?: NodeOnDiskFile | null
@@ -157,15 +149,46 @@ export async function requestReportNode(id: number, reason: string) {
   }
 }
 
+export async function requestVerifyNode(id: number, userId: number) {
+  try {
+    const node = await findNode(id);
+    if (!node) {
+      return badRequest<PostNodeActionData>({
+        formError: "Can not find node",
+      });
+    }
+    if (node.userId) {
+      return badRequest<PostNodeActionData>({
+        formError: "Already verified",
+      });
+    }
+    node.userId = userId;
+    await updateNode(node);
+
+    const nodeLocations = await findNodeLocations({ areaNodeId: id });
+    postToDiscord("verified", node, nodeLocations[0]);
+  } catch (error) {
+    return badRequest<PostNodeActionData>({
+      formError: "Report failed",
+    });
+  }
+}
+
 export const nodeAction = async ({ request }: ActionArgs) => {
   try {
+    const response = new Response();
+    const supabase = createServerClient({ request, response });
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const user = session && (await findOrCreateUser(session.user.id));
+
     const contentType = request.headers.get("Content-Type") || "";
     const [type] = contentType.split(/\s*;\s*boundary=/);
 
     const body = await (type === "multipart/form-data"
       ? unstable_parseMultipartFormData(request, uploadHandler)
       : request.formData());
-    const user = await requestUser(body.get("userToken")?.toString());
 
     const action = body.get("_action")?.toString();
     switch (action) {
@@ -192,7 +215,7 @@ export const nodeAction = async ({ request }: ActionArgs) => {
           const node: AreaNodeWithoutId = {
             ...partialFormData,
             description: formData.description.replace("<p><br></p>", ""),
-            userId: user ? user.id : null,
+            userId: user?.id || null,
             transitToId: formData.transitToId || null,
           };
 
@@ -253,11 +276,6 @@ export const nodeAction = async ({ request }: ActionArgs) => {
         break;
       case "update":
         {
-          if (!user) {
-            return badRequest<PostNodeActionData>({
-              formError: "You shall not pass",
-            });
-          }
           const formData = parseFormData<UpdateNodeForm>(body, {
             id: "number",
             locationId: "number",
@@ -275,6 +293,19 @@ export const nodeAction = async ({ request }: ActionArgs) => {
           if (formData instanceof Response) {
             return formData;
           }
+          const existingNode = await findNode(formData.id);
+          if (!existingNode) {
+            return badRequest<PostNodeActionData>({
+              formError: "Can not find node",
+            });
+          }
+          console.log(existingNode.userId, user?.id, user?.isModerator);
+          if (!user || (!user.isModerator && existingNode.userId !== user.id)) {
+            return badRequest<PostNodeActionData>({
+              formError: "You shall not pass",
+            });
+          }
+
           const { lat, lng, areaName, tileId, locationId, ...partialFormData } =
             formData;
           const position = [lat, lng];
@@ -306,17 +337,21 @@ export const nodeAction = async ({ request }: ActionArgs) => {
         break;
       case "delete":
         {
-          if (!user) {
-            return badRequest<PostNodeActionData>({
-              formError: "You shall not pass",
-            });
-          }
-
           const formData = parseFormData<{ id: number }>(body, {
             id: "number",
           });
           if (formData instanceof Response) {
             return formData;
+          }
+
+          const nodeLocation = await findNodeLocation(formData.id);
+          if (
+            !user ||
+            (!user.isModerator && nodeLocation?.areaNode.userId !== user.id)
+          ) {
+            return badRequest<PostNodeActionData>({
+              formError: "You shall not pass",
+            });
           }
 
           const deletedNodeLocation = await deleteNodeLocation(formData.id);
@@ -346,12 +381,28 @@ export const nodeAction = async ({ request }: ActionArgs) => {
           await requestReportNode(formData.id, formData.reason);
         }
         break;
+
+      case "verify":
+        {
+          if (!user) {
+            return badRequest<PostNodeActionData>({
+              formError: "You shall not pass",
+            });
+          }
+          const formData = parseFormData<{ id: number }>(body, {
+            id: "number",
+          });
+          if (formData instanceof Response) {
+            return formData;
+          }
+          await requestVerifyNode(formData.id, user.id);
+        }
+        break;
     }
 
+    response.headers.set("Set-Cookie", "_vercel_no_cache=1;Max-Age=60");
     return json(null, {
-      headers: {
-        "Set-Cookie": "_vercel_no_cache=1;Max-Age=60",
-      },
+      headers: response.headers,
     });
   } catch (error) {
     console.error(error);

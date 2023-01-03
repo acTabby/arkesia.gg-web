@@ -22,9 +22,10 @@ model AreaNode {
 }
 
 model User {
-  id    Int        @id @default(autoincrement())
-  token String     @unique
-  nodes AreaNode[]
+  id          Int        @id @default(autoincrement())
+  token       String     @unique
+  nodes       AreaNode[]
+  isModerator Boolean?
 
   @@index([token])
 }

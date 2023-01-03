@@ -89,7 +89,7 @@ const FiltersSelect = () => {
                 },
               }}
             >
-              <IconStack />
+              <IconStack width="100%" />
             </ActionIcon>
           </Popover.Target>
           <Popover.Dropdown>{content}</Popover.Dropdown>
