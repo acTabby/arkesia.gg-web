@@ -246,6 +246,7 @@ function CustomAction({
   classNames,
   hovered,
   onTrigger,
+  highlightQuery,
   ...others
 }: SpotlightActionProps) {
   const { classes, cx } = useStyles(undefined, {

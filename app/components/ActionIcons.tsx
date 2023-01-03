@@ -90,10 +90,7 @@ export default function ActionIcons() {
           <IconSettings color="#ced4da" width="100%" height="100%" />
         </ActionIcon>
       </Tooltip>
-
-      <Tooltip zIndex={9100} label={<Text>Sign in</Text>}>
-        <User />
-      </Tooltip>
+      <User />
       <Dialog
         opened={openedSettings}
         withCloseButton
