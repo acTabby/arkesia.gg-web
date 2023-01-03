@@ -10,11 +10,12 @@ import {
 import type { ShouldReloadFunction } from "@remix-run/react";
 import styles from "~/styles/global.css";
 import leafletStyles from "leaflet/dist/leaflet.css";
-import { Global, MantineProvider, createEmotionCache } from "@mantine/core";
+import { MantineProvider, createEmotionCache } from "@mantine/core";
 import { StylesPlaceholder } from "@mantine/remix";
 import { initPlausible } from "./lib/stats";
 import { useEffect } from "react";
 import { json } from "@remix-run/node";
+import theme from "./theme";
 
 export function links() {
   return [
@@ -30,6 +31,7 @@ export const meta = () => {
     description:
       "Arkesia.gg is an interactive map with mokoko seeds, hidden stories and more for Lost Ark.",
     keywords: "Lost Ark,Arkesia,Map,World,Mokoko seeds",
+    viewport: "width=device-width,initial-scale=1",
   };
 };
 
@@ -58,31 +60,18 @@ export default function App() {
   }, []);
 
   return (
-    <MantineProvider
-      theme={{ fontFamily: "NunitoVariable", colorScheme: "dark" }}
-      withGlobalStyles
-      withNormalizeCSS
-    >
+    <MantineProvider theme={theme} withGlobalStyles withNormalizeCSS>
       <html lang="en">
         <head>
-          <meta charSet="utf-8" />
-          <meta name="viewport" content="width=device-width,initial-scale=1" />
           <StylesPlaceholder />
           <Meta />
           <Links />
         </head>
         <body>
-          <Global
-            styles={() => ({
-              body: {
-                overflow: "hidden",
-              },
-            })}
-          />
           <Outlet />
           <ScrollRestoration />
           <Scripts />
-          {process.env.NODE_ENV === "development" && <LiveReload />}
+          <LiveReload />
         </body>
       </html>
     </MantineProvider>

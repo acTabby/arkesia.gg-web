@@ -121,6 +121,7 @@ export default function NodeDetails() {
     }
     setSearchParams(newSearchParams);
   }, [selectedNodeLocation]);
+
   return (
     <Drawer
       opened={Boolean(selectedNodeLocation && !editingNodeLocation)}
