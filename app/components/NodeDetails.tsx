@@ -3,6 +3,7 @@ import {
   Drawer,
   Group,
   ScrollArea,
+  Skeleton,
   Space,
   Stack,
   Text,
@@ -135,7 +136,9 @@ export default function NodeDetails() {
       }}
       title={
         selectedNodeLocation?.areaNode?.name ||
-        selectedNodeLocation?.areaNode?.type
+        selectedNodeLocation?.areaNode?.type || (
+          <Skeleton height={20} width={120} />
+        )
       }
       styles={{
         body: {
