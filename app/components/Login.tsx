@@ -6,12 +6,16 @@ export default function Login() {
   const { supabase, session, user } = useSupabase();
 
   const handleDiscordLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "discord",
-    });
-
-    if (error) {
-      console.log({ error });
+    if (window !== window.top && window.top) {
+      // Website is loaded in an iframe. Tell parent to open `/login`
+      window.top.postMessage({ provider: "discord" }, "*");
+    } else {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "discord",
+      });
+      if (error) {
+        console.log({ error });
+      }
     }
   };
 

@@ -44,7 +44,9 @@ export default function Supabase() {
   const { env, session, user } = useLoaderData<typeof loader>();
   const fetcher = useFetcher();
   const [supabase] = useState(() =>
-    createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLIC_KEY)
+    createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLIC_KEY, {
+      cookieOptions: { sameSite: "none", secure: true },
+    })
   );
   const serverAccessToken = session?.access_token;
 
