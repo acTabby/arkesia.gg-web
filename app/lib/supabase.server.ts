@@ -10,5 +10,8 @@ export const createServerClient = ({
   _createServerClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_PUBLIC_KEY!,
-    { request, response, cookieOptions: { sameSite: "none", secure: true } }
+    {
+      request,
+      response,
+    }
   );
