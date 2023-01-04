@@ -128,3 +128,17 @@ export const findUser = async (token: string) => {
   const user = await db.user.findFirst({ where: { token } });
   return user;
 };
+
+export const insertUser = async (token: string) => {
+  const user = await db.user.create({
+    data: {
+      token,
+      isModerator: false,
+    },
+  });
+  return user;
+};
+
+export const findOrCreateUser = async (userId: string) => {
+  return (await findUser(userId)) || (await insertUser(userId));
+};

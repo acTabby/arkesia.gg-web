@@ -1,13 +1,11 @@
 import {
-  InputWrapper,
+  Input,
   SegmentedControl,
   Slider,
   Space,
   Switch,
   Text,
-  TextInput,
 } from "@mantine/core";
-import { useLocalStorageValue } from "@mantine/hooks";
 import { useEffect } from "react";
 import {
   useDrawerPosition,
@@ -20,10 +18,6 @@ import {
 import { DiscoveredNodes } from "./DiscoveredNodes";
 
 const Settings = () => {
-  const [userToken, setUserToken] = useLocalStorageValue<string>({
-    key: "user-token",
-    defaultValue: "",
-  });
   const setDrawerPosition = useSetDrawerPosition();
   const showNameOnMap = useShowNameOnMap();
   const toggleShowNameOnMap = useToggleShowNameOnMap();
@@ -41,15 +35,6 @@ const Settings = () => {
 
   return (
     <>
-      <TextInput
-        label="User-Token"
-        required
-        placeholder="Only for moderators right now"
-        value={userToken}
-        onChange={(event) => setUserToken(event.target.value)}
-        name="userToken"
-      />
-      <Space h="md" />
       <Text style={{ marginBottom: 10 }} weight={500}>
         Map
       </Text>
@@ -58,7 +43,7 @@ const Settings = () => {
         checked={showNameOnMap}
         onChange={toggleShowNameOnMap}
       />
-      <InputWrapper label="Marker size" style={{ marginTop: 5 }}>
+      <Input.Wrapper label="Marker size" style={{ marginTop: 5 }}>
         <Slider
           value={markerSize}
           onChange={setMarkerSize}
@@ -66,7 +51,7 @@ const Settings = () => {
           max={60}
           label={null}
         />
-      </InputWrapper>
+      </Input.Wrapper>
       <Space h="md" />
       <DiscoveredNodes />
       <Text style={{ marginBottom: 10 }} weight={500}>

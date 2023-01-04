@@ -7,8 +7,6 @@ import includeCanvasTileLayer from "./includeCanvasTileLayer";
 import TileControl from "./TileControl";
 import { getBounds, getMapCenter } from "~/lib/map";
 import UpsertMarker from "./UpsertMarker";
-import { useParams } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
 import { useDidUpdate } from "@mantine/hooks";
 import {
   useLastAreaNames,
@@ -18,8 +16,9 @@ import {
   useSetMap,
   useSetSelectedNodeLocation,
 } from "~/lib/store";
-import { useNodeLocations } from "~/lib/loaders";
 import { arkesiaArea, continents } from "~/lib/static";
+import { useLoaderData, useParams, useSearchParams } from "@remix-run/react";
+import type { loader } from "~/routes/__supabase/$continent.$area";
 
 includeCanvasTileLayer();
 
@@ -36,7 +35,7 @@ export default function MapView() {
     );
   }, [params.area, params.continent]);
 
-  const nodeLocations = useNodeLocations();
+  const { nodeLocations = [] } = useLoaderData<typeof loader>();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const setEditingNodeLocation = useSetEditingNodeLocation();

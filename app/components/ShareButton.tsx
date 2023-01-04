@@ -1,6 +1,6 @@
 import { Button, Group } from "@mantine/core";
-import { useNotifications } from "@mantine/notifications";
-import { Share1Icon } from "@modulz/radix-icons";
+import { showNotification } from "@mantine/notifications";
+import { IconShare } from "@tabler/icons";
 import { areaContinents } from "~/lib/static";
 import type { AreaNodeLocationDTO } from "~/lib/types";
 
@@ -31,8 +31,6 @@ type ShareButtonProps = {
   areaNodeLocation: AreaNodeLocationDTO;
 };
 const ShareButton = ({ areaNodeLocation }: ShareButtonProps) => {
-  const notifications = useNotifications();
-
   const handleShare = async () => {
     const continent = areaContinents[areaNodeLocation.areaName];
     const shareData = {
@@ -45,7 +43,7 @@ const ShareButton = ({ areaNodeLocation }: ShareButtonProps) => {
     } catch (error) {
       console.error(error);
       copyTextToClipboard(shareData.url);
-      notifications.showNotification({
+      showNotification({
         title: "Link copied to clipboard",
         message: "",
       });
@@ -67,7 +65,7 @@ const ShareButton = ({ areaNodeLocation }: ShareButtonProps) => {
       onClick={handleShare}
     >
       <Group>
-        <Share1Icon />
+        <IconShare />
         Share
       </Group>
     </Button>

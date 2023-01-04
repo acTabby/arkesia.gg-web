@@ -10,21 +10,15 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import {
-  DrawingPinIcon,
-  GearIcon,
-  GitHubLogoIcon,
-  InfoCircledIcon,
-} from "@modulz/radix-icons";
+import { IconInfoCircle, IconMapPin, IconSettings } from "@tabler/icons";
 import { useState } from "react";
-import { trackOutboundLinkClick } from "~/lib/stats";
 import {
   useDrawerPosition,
   useMap,
   useSetEditingNodeLocation,
 } from "~/lib/store";
-import { DiscordIcon } from "./DiscordIcon";
 import Settings from "./Settings";
+import User from "./User";
 
 export default function ActionIcons() {
   const [openedSettings, setOpenedSettings] = useState(false);
@@ -75,59 +69,28 @@ export default function ActionIcons() {
               });
             }
           }}
-          size="md"
+          size="lg"
           aria-label="Propose a node"
-          p={4}
+          p={6}
+          color="dark"
+          variant="filled"
         >
-          <DrawingPinIcon color="#ced4da" width="100%" height="100%" />
+          <IconMapPin color="#ced4da" width="100%" height="100%" />
         </ActionIcon>
       </Tooltip>
       <Tooltip zIndex={9100} label={<Text>Settings</Text>}>
         <ActionIcon
           onClick={() => setOpenedSettings((opened) => !opened)}
-          size="md"
+          size="lg"
           aria-label="Settings"
-          p={4}
+          p={6}
+          color="dark"
+          variant="filled"
         >
-          <GearIcon color="#ced4da" width="100%" height="100%" />
+          <IconSettings color="#ced4da" width="100%" height="100%" />
         </ActionIcon>
       </Tooltip>
-      <Tooltip zIndex={9100} label={<Text>Contribute or give feedback</Text>}>
-        <ActionIcon
-          component="a"
-          href="https://github.com/lmachens/arkesia.gg-web"
-          target="_blank"
-          size="md"
-          aria-label="Contribute or give feedback"
-          p={4}
-          onClick={() =>
-            trackOutboundLinkClick("https://github.com/lmachens/arkesia.gg-web")
-          }
-        >
-          <GitHubLogoIcon color="#ced4da" width="100%" height="100%" />
-        </ActionIcon>
-      </Tooltip>
-      <Tooltip zIndex={9100} label={<Text>Join the community</Text>}>
-        <ActionIcon
-          component="a"
-          href="https://discord.com/invite/NTZu8Px"
-          target="_blank"
-          size="md"
-          sx={{
-            backgroundColor: "#5865f2",
-            "&:hover": {
-              backgroundColor: "#6974f3",
-            },
-          }}
-          aria-label="Join the community"
-          p={4}
-          onClick={() =>
-            trackOutboundLinkClick("https://discord.com/invite/NTZu8Px")
-          }
-        >
-          <DiscordIcon color="#ced4da" width="100%" height="100%" />
-        </ActionIcon>
-      </Tooltip>
+      <User />
       <Dialog
         opened={openedSettings}
         withCloseButton
@@ -152,37 +115,35 @@ export default function ActionIcons() {
         <Popover
           opened={opened}
           onClose={handlers.close}
-          target={
+          position="bottom"
+          withArrow
+          zIndex={8900}
+          radius="sm"
+        >
+          <Popover.Target>
             <ActionIcon
               onClick={handlers.toggle}
               size="lg"
               variant="filled"
               title="Actions"
               color="cyan"
+              sx={{
+                display: "none",
+                "@media (max-width: 800px)": {
+                  display: "block",
+                },
+              }}
             >
-              <InfoCircledIcon />
+              <IconInfoCircle width="100%" />
             </ActionIcon>
-          }
-          position="bottom"
-          withArrow
-          zIndex={8900}
-          radius="sm"
-          sx={{
-            display: "none",
-            "@media (max-width: 800px)": {
-              display: "block",
-            },
-          }}
-        >
-          {content}
+          </Popover.Target>
+          <Popover.Dropdown>{content}</Popover.Dropdown>
         </Popover>
       </MediaQuery>
       <MediaQuery largerThan="sm" styles={css}>
         <Container
           sx={(theme) => ({
-            borderRadius: theme.radius.sm,
             padding: theme.spacing.xs,
-            backgroundColor: theme.colors.dark[8],
             "@media (max-width: 800px)": {
               display: "none",
             },

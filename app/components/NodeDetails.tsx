@@ -3,17 +3,20 @@ import {
   Drawer,
   Group,
   ScrollArea,
+  Skeleton,
   Space,
+  Stack,
   Text,
   TextInput,
-  Title,
-  Stack,
 } from "@mantine/core";
-import { useDidUpdate, useLocalStorageValue } from "@mantine/hooks";
-import { useNotifications } from "@mantine/notifications";
-import { EyeClosedIcon, EyeOpenIcon } from "@modulz/radix-icons";
-import { useEffect, useRef } from "react";
-import { Form, useActionData, useTransition } from "@remix-run/react";
+import { useDidUpdate } from "@mantine/hooks";
+import {
+  Form,
+  useActionData,
+  useLocation,
+  useSearchParams,
+  useTransition,
+} from "@remix-run/react";
 import {
   useDiscoveredNodes,
   useDrawerPosition,
@@ -26,13 +29,19 @@ import {
 import { AvailableNodes } from "./AvailableNodes";
 import ImagePreview from "./ImagePreview";
 import NodeDescription from "./NodeDescription";
-import type { URLSearchParamsInit } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
 import { ClientOnly } from "remix-utils";
 import IslandGuideLink from "./IslandGuideLink";
 import ShareButton from "./ShareButton";
 import type { nodeAction } from "~/lib/actions.server";
+import {
+  IconAlertTriangle,
+  IconCheck,
+  IconEye,
+  IconEyeOff,
+} from "@tabler/icons";
+import { showNotification, updateNotification } from "@mantine/notifications";
+import { useState } from "react";
+import useSupabase from "~/hooks/useSupabase";
 
 export default function NodeDetails() {
   const location = useLocation();
@@ -42,53 +51,66 @@ export default function NodeDetails() {
   const setEditingNodeLocation = useSetEditingNodeLocation();
   const transition = useTransition();
   const actionData = useActionData<typeof nodeAction>();
-  const [userToken] = useLocalStorageValue<string>({
-    key: "user-token",
-    defaultValue: "",
-  });
-  const notifications = useNotifications();
-  const notificationId = useRef<string | null>(null);
+  const { user } = useSupabase();
   const discoveredNodes = useDiscoveredNodes();
   const toggleDiscoveredNode = useToggleDiscoveredNode();
   const drawerPosition = useDrawerPosition();
   const [searchParams, setSearchParams] = useSearchParams();
   const nodeLocation = useEditingNodeLocation();
-
-  useEffect(() => {
+  const [prevAction, setPrevAction] = useState<"delete" | "verify" | null>(
+    null
+  );
+  useDidUpdate(() => {
     if (nodeLocation) {
       return;
     }
     if (transition.state === "submitting") {
-      notificationId.current = notifications.showNotification({
+      const action =
+        transition.submission?.method === "PATCH" ? "verify" : "delete";
+      const title =
+        action === "verify"
+          ? "Verifying node"
+          : user?.isModerator
+          ? "Submitting deletion request"
+          : "Reporting issue";
+      showNotification({
+        id: "notification",
         loading: true,
-        title: userToken ? "Submitting deletion request" : "Reporting issue",
+        title,
         message: "",
         autoClose: false,
         disallowClose: true,
       });
-    } else if (transition.state === "idle" && notificationId.current) {
+      setPrevAction(action);
+    } else if (transition.state === "idle" && prevAction) {
       if (actionData) {
-        notifications.updateNotification(notificationId.current, {
-          id: notificationId.current,
+        updateNotification({
+          id: "notification",
           title: "Something is wrong",
           message: "",
           color: "red",
         });
       } else {
-        notifications.updateNotification(notificationId.current, {
-          id: notificationId.current,
-          title: userToken ? "Node deleted 💀" : "Issue reported",
+        const title =
+          prevAction === "verify"
+            ? "Verified node"
+            : user?.isModerator
+            ? "Node deleted 💀"
+            : "Issue reported";
+        updateNotification({
+          id: "notification",
+          title,
           message: "",
         });
-        notificationId.current = null;
         setSelectedNodeLocation(null);
       }
+      setPrevAction(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transition.state, actionData, transition.submission?.method]);
 
   useDidUpdate(() => {
-    const newSearchParams: URLSearchParamsInit = {};
+    const newSearchParams: Parameters<typeof setSearchParams>[0] = {};
     const tileId = searchParams.get("tileId");
     if (tileId) {
       newSearchParams.tileId = tileId;
@@ -113,19 +135,22 @@ export default function NodeDetails() {
         position: "relative",
         zIndex: 10950,
       }}
+      title={
+        selectedNodeLocation?.areaNode?.name ||
+        selectedNodeLocation?.areaNode?.type || (
+          <Skeleton height={20} width={120} />
+        )
+      }
+      styles={{
+        body: {
+          height: "calc(100% - 50px)",
+        },
+      }}
     >
-      <Stack style={{ height: "calc(100% - 50px)" }} spacing={0}>
+      <Stack style={{ height: "100%" }} spacing={0}>
         {selectedNodeLocation && (
           <>
-            <Title order={3}>
-              {selectedNodeLocation.areaNode.name ||
-                selectedNodeLocation.areaNode.type}
-            </Title>
             <Text color="teal">{selectedNodeLocation.areaNode.type}</Text>
-            <Text size="xs">
-              Node ID: {selectedNodeLocation.areaNodeId} Location ID:{" "}
-              {selectedNodeLocation.id}
-            </Text>
             {(selectedNodeLocation.areaNode.type === "Island" ||
               selectedNodeLocation.areaNode.type === "PvP Island") && (
               <IslandGuideLink areaNode={selectedNodeLocation.areaNode} />
@@ -175,11 +200,11 @@ export default function NodeDetails() {
                         discoveredNode.id === selectedNodeLocation.areaNodeId
                     ) ? (
                       <>
-                        <EyeClosedIcon /> Discovered
+                        <IconEyeOff /> Discovered
                       </>
                     ) : (
                       <>
-                        <EyeOpenIcon />
+                        <IconEye />
                         Not discovered
                       </>
                     )
@@ -189,10 +214,10 @@ export default function NodeDetails() {
             </Button>
             <ShareButton areaNodeLocation={selectedNodeLocation} />
             <Text size="xs">See all discovered nodes in the settings</Text>
-            <Space h="md" />
-            <ClientOnly>
-              {() =>
-                userToken ? (
+            <Stack spacing="xs">
+              {user &&
+                (user.isModerator ||
+                  user.id === selectedNodeLocation.areaNode.userId) && (
                   <Form
                     action={`${location.pathname}${location.search}`}
                     method="delete"
@@ -204,14 +229,6 @@ export default function NodeDetails() {
                       name="id"
                       value={selectedNodeLocation.id}
                     />
-                    <input type="hidden" name="userToken" value={userToken} />
-                    <Button
-                      type="submit"
-                      color="red"
-                      loading={transition.state !== "idle"}
-                    >
-                      Delete
-                    </Button>
                     <Button
                       type="button"
                       color="teal"
@@ -222,8 +239,17 @@ export default function NodeDetails() {
                     >
                       Edit
                     </Button>
+                    <Button
+                      type="submit"
+                      color="red"
+                      loading={transition.state !== "idle"}
+                    >
+                      Delete
+                    </Button>
                   </Form>
-                ) : (
+                )}
+              {!user?.isModerator &&
+                user?.id !== selectedNodeLocation.areaNode.userId && (
                   <Form
                     action={`${location.pathname}${location.search}`}
                     method="post"
@@ -243,15 +269,42 @@ export default function NodeDetails() {
                     />
                     <Button
                       type="submit"
-                      color="teal"
+                      color="orange"
                       loading={transition.state !== "idle"}
+                      leftIcon={<IconAlertTriangle />}
                     >
                       Report issue
                     </Button>
                   </Form>
-                )
-              }
-            </ClientOnly>
+                )}
+              {user && !selectedNodeLocation.areaNode.userId && (
+                <Form
+                  action={`${location.pathname}${location.search}`}
+                  method="patch"
+                  className="node-form"
+                >
+                  <input type="hidden" name="_action" value="verify" />
+                  <input
+                    type="hidden"
+                    name="id"
+                    value={selectedNodeLocation.areaNode.id}
+                  />
+                  <Button
+                    type="submit"
+                    color="teal"
+                    loading={transition.state !== "idle"}
+                    leftIcon={<IconCheck />}
+                  >
+                    Verify node
+                  </Button>
+                </Form>
+              )}
+              <Text size="xs">
+                Node ID: {selectedNodeLocation.areaNodeId} Location ID:{" "}
+                {selectedNodeLocation.id} Verified By:{" "}
+                {selectedNodeLocation.areaNode.userId || "-"}
+              </Text>
+            </Stack>
           </>
         )}
       </Stack>

@@ -4,7 +4,7 @@ import { continents } from "./static";
 const turndownService = new TurndownService();
 
 export function postToDiscord(
-  action: "inserted" | "deleted" | "updated" | "report",
+  action: "inserted" | "deleted" | "updated" | "report" | "verified",
   node: AreaNode,
   nodeLocation: AreaNodeLocation,
   reason?: string
@@ -26,6 +26,9 @@ export function postToDiscord(
     }
   } else if (action === "updated") {
     payload.content = `📝 This node has been updated!`;
+    webhookUrl = process.env.DISCORD_ACTIVITY_WEBHOOK_URL;
+  } else if (action === "verified") {
+    payload.content = `✅ This node has been verified!`;
     webhookUrl = process.env.DISCORD_ACTIVITY_WEBHOOK_URL;
   } else if (action === "deleted") {
     payload.content = `💀 This node has been deleted!`;

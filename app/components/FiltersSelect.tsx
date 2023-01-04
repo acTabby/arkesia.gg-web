@@ -3,9 +3,9 @@ import { Container } from "@mantine/core";
 import { ActionIcon, Checkbox, MediaQuery, Popover } from "@mantine/core";
 import { Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { StackIcon } from "@modulz/radix-icons";
+import { useParams } from "@remix-run/react";
+import { IconStack } from "@tabler/icons";
 import { useMemo } from "react";
-import { useParams } from "react-router-dom";
 import { arkesiaArea, continents, nodeCategories } from "~/lib/static";
 import { useDrawerPosition, useFilters, useSetFilters } from "~/lib/store";
 import IslandGuideLink from "./IslandGuideLink";
@@ -70,29 +70,29 @@ const FiltersSelect = () => {
         <Popover
           opened={opened}
           onClose={handlers.close}
-          target={
+          position="bottom"
+          withArrow
+          zIndex={8900}
+          radius="sm"
+        >
+          <Popover.Target>
             <ActionIcon
               onClick={handlers.toggle}
               size="lg"
               variant="filled"
               title="Filters"
               color="cyan"
+              sx={{
+                display: "none",
+                "@media (max-width: 800px)": {
+                  display: "block",
+                },
+              }}
             >
-              <StackIcon />
+              <IconStack width="100%" />
             </ActionIcon>
-          }
-          position="bottom"
-          withArrow
-          zIndex={8900}
-          radius="sm"
-          sx={{
-            display: "none",
-            "@media (max-width: 800px)": {
-              display: "block",
-            },
-          }}
-        >
-          {content}
+          </Popover.Target>
+          <Popover.Dropdown>{content}</Popover.Dropdown>
         </Popover>
       </MediaQuery>
       <MediaQuery largerThan="sm" styles={css}>

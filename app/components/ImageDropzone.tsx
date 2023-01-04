@@ -1,17 +1,11 @@
-import type { DropzoneProps, DropzoneStatus } from "@mantine/dropzone";
+import type { DropzoneProps } from "@mantine/dropzone";
 import { Dropzone, IMAGE_MIME_TYPE } from "@mantine/dropzone";
 import ImageUploadIcon from "./ImageUploadIcon";
 import type { MantineTheme } from "@mantine/core";
-import {
-  ActionIcon,
-  Group,
-  Image,
-  InputWrapper,
-  Text,
-  useMantineTheme,
-} from "@mantine/core";
+import { Input } from "@mantine/core";
+import { ActionIcon, Group, Image, Text, useMantineTheme } from "@mantine/core";
 import { useEffect } from "react";
-import { Cross2Icon } from "@modulz/radix-icons";
+import { IconX } from "@tabler/icons";
 
 type ImageDropzoneProps = Omit<DropzoneProps, "children"> & {
   src?: string | null;
@@ -47,7 +41,7 @@ export default function ImageDropzone({
   }, [onDrop]);
 
   return (
-    <InputWrapper
+    <Input.Wrapper
       label="Screenshot"
       sx={() => ({
         position: "relative",
@@ -59,36 +53,56 @@ export default function ImageDropzone({
         onDrop={onDrop}
         {...props}
       >
-        {(status) => (
-          <Group
-            position="center"
-            spacing="xl"
-            style={{ minHeight: 220, pointerEvents: "none" }}
-          >
-            {src ? (
-              <Image src={src} alt="" />
-            ) : (
-              <>
+        <Group
+          position="center"
+          spacing="xl"
+          style={{ minHeight: 220, pointerEvents: "none" }}
+        >
+          {src ? (
+            <Image src={src} alt="" />
+          ) : (
+            <>
+              <Dropzone.Accept>
                 <ImageUploadIcon
-                  status={status}
+                  status="accepted"
                   style={{
                     width: 80,
                     height: 80,
-                    color: getIconColor(status, theme),
+                    color: getIconColor("accepted", theme),
                   }}
                 />
-                <div>
-                  <Text size="xl" inline>
-                    Paste, drag image here or click to select file
-                  </Text>
-                  <Text size="sm" color="dimmed" inline mt={7}>
-                    The image should not exceed 5mb
-                  </Text>
-                </div>
-              </>
-            )}
-          </Group>
-        )}
+              </Dropzone.Accept>
+              <Dropzone.Reject>
+                <ImageUploadIcon
+                  status="rejected"
+                  style={{
+                    width: 80,
+                    height: 80,
+                    color: getIconColor("rejected", theme),
+                  }}
+                />
+              </Dropzone.Reject>
+              <Dropzone.Idle>
+                <ImageUploadIcon
+                  status="idle"
+                  style={{
+                    width: 80,
+                    height: 80,
+                    color: getIconColor("idle", theme),
+                  }}
+                />
+              </Dropzone.Idle>
+              <div>
+                <Text size="xl" inline>
+                  Paste, drag image here or click to select file
+                </Text>
+                <Text size="sm" color="dimmed" inline mt={7}>
+                  The image should not exceed 5mb
+                </Text>
+              </div>
+            </>
+          )}
+        </Group>
       </Dropzone>
       {src && (
         <ActionIcon
@@ -99,17 +113,20 @@ export default function ImageDropzone({
             right: 0,
           })}
         >
-          <Cross2Icon />
+          <IconX />
         </ActionIcon>
       )}
-    </InputWrapper>
+    </Input.Wrapper>
   );
 }
 
-function getIconColor(status: DropzoneStatus, theme: MantineTheme) {
-  return status.accepted
+function getIconColor(
+  status: "accepted" | "rejected" | "idle",
+  theme: MantineTheme
+) {
+  return status === "accepted"
     ? theme.colors[theme.primaryColor][6]
-    : status.rejected
+    : status === "rejected"
     ? theme.colors.red[6]
     : theme.colorScheme === "dark"
     ? theme.colors.dark[0]

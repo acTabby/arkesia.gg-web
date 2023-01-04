@@ -1,9 +1,9 @@
 import type { AreaNode, AreaNodeLocation } from "@prisma/client";
+import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
 import create from "zustand";
 import { persist } from "zustand/middleware";
-import { useNodeLocations } from "./loaders";
+import type { loader } from "~/routes/__supabase/$continent.$area";
 import { nodeCategories } from "./static";
 import type { AreaNodeLocationDTO } from "./types";
 
@@ -205,7 +205,7 @@ export const useSessionStore = create(
 const selectedNodeLocationSelector = (state: SessionStoreProps) =>
   state.selectedNodeLocation;
 export const useSelectedNodeLocation = () => {
-  const nodeLocations = useNodeLocations();
+  const { nodeLocations = [] } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
   const nodeParam = searchParams.get("node");
   const nodeId = nodeParam ? +nodeParam : null;

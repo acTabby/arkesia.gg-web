@@ -1,18 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Tooltip } from "react-leaflet";
-import { Form, useActionData, useTransition } from "@remix-run/react";
-import { useNotifications } from "@mantine/notifications";
+import {
+  Form,
+  useActionData,
+  useLocation,
+  useTransition,
+} from "@remix-run/react";
+import { showNotification, updateNotification } from "@mantine/notifications";
 import type { Area, Tile } from "~/lib/types";
 import {
   Anchor,
   Button,
   Drawer,
-  InputWrapper,
+  Input,
   ScrollArea,
   Text,
   TextInput,
 } from "@mantine/core";
-import { useLocalStorageValue } from "@mantine/hooks";
 import ImageDropzone from "./ImageDropzone";
 import type { PostNodeActionData } from "~/lib/validation";
 import RichTextEditor from "@mantine/rte";
@@ -25,7 +29,7 @@ import {
 } from "~/lib/store";
 import TypeSelect from "./TypeSelect";
 import { trackOutboundLinkClick } from "~/lib/stats";
-import { useLocation } from "react-router-dom";
+import useSupabase from "~/hooks/useSupabase";
 
 type UpsertMarkerProps = {
   area: Area;
@@ -39,16 +43,11 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
   const nodeLocation = useEditingNodeLocation();
   const setEditingNodeLocation = useSetEditingNodeLocation();
   const [lastType, setLastType] = useLastType();
-
+  const { user } = useSupabase();
   const transition = useTransition();
-  const notifications = useNotifications();
-  const notificationId = useRef<string | null>(null);
-  const [userToken] = useLocalStorageValue<string>({
-    key: "user-token",
-    defaultValue: "",
-  });
   const actionData = useActionData<PostNodeActionData>();
   const drawerPosition = useDrawerPosition();
+  const [prevState, setPrevState] = useState(transition.state);
 
   useEffect(() => {
     if (!nodeLocation) {
@@ -58,32 +57,35 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
       transition.state === "submitting" &&
       transition.submission?.method === "POST"
     ) {
-      notificationId.current = notifications.showNotification({
+      showNotification({
+        id: "notification",
         loading: true,
         title: "Submitting node",
         message: "",
         autoClose: false,
         disallowClose: true,
       });
-    } else if (transition.state === "idle" && notificationId.current) {
+      setPrevState(transition.state);
+    } else if (transition.state === "idle" && prevState !== "idle") {
       if (actionData) {
-        notifications.updateNotification(notificationId.current, {
-          id: notificationId.current,
+        updateNotification({
+          id: "notification",
           title: "Something is wrong",
           message: "",
           color: "red",
         });
       } else {
-        notifications.updateNotification(notificationId.current, {
-          id: notificationId.current,
-          title: userToken ? "Node added 🤘" : "Node added for review 🤘",
+        updateNotification({
+          id: "notification",
+          title: user ? "Node updated 🤘" : "Node submitted for review 🤘",
           message: "",
         });
-        notificationId.current = null;
         setFileScreenshot(null);
         setEditingNodeLocation(null);
       }
+      setPrevState(transition.state);
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transition.state, actionData, transition.submission?.method]);
 
@@ -132,8 +134,16 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
           setEditingNodeLocation(null);
           setFileScreenshot(null);
         }}
+        title={
+          nodeLocation?.areaNode?.name || nodeLocation?.areaNode?.type || ""
+        }
+        styles={{
+          body: {
+            height: "calc(100% - 50px)",
+          },
+        }}
       >
-        <ScrollArea style={{ height: "calc(100% - 50px)" }}>
+        <ScrollArea style={{ height: "100%" }}>
           {nodeLocation?.position && (
             <>
               <Form
@@ -168,7 +178,6 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
                   name="locationId"
                   value={nodeLocation?.id}
                 />
-                <input type="hidden" name="userToken" value={userToken} />
                 <TypeSelect
                   category={area.category}
                   name="type"
@@ -201,7 +210,7 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
                   name="name"
                   error={actionData?.fieldErrors?.name}
                 />
-                <InputWrapper
+                <Input.Wrapper
                   label="Description (optional)"
                   error={actionData?.fieldErrors?.description}
                 >
@@ -229,7 +238,7 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
                     value={nodeLocation.areaNode?.description || ""}
                     name="description"
                   />
-                </InputWrapper>
+                </Input.Wrapper>
                 <TextInput
                   label="Transit to node ID (optional)"
                   placeholder="Enter node ID"
@@ -260,7 +269,7 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
                     setFileScreenshot(null);
                   }}
                   onReject={() =>
-                    notifications.showNotification({
+                    showNotification({
                       title: "Upload failed",
                       message: "",
                       color: "red",
@@ -290,29 +299,10 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
                   loading={transition.state !== "idle"}
                   variant="gradient"
                 >
-                  {userToken ? "Save" : "Submit for review"}
+                  {user ? "Save" : "Submit for review"}
                 </Button>
-                {!userToken && (
-                  <Text size="xs">
-                    Join us in{" "}
-                    <Anchor
-                      size="xs"
-                      href="https://discord.com/invite/NTZu8Px"
-                      target="_blank"
-                      onClick={() =>
-                        trackOutboundLinkClick(
-                          "https://discord.com/invite/NTZu8Px"
-                        )
-                      }
-                      rel="noreferrer"
-                    >
-                      Discord
-                    </Anchor>{" "}
-                    to help maintaining nodes
-                  </Text>
-                )}
               </Form>
-              {!nodeLocation?.id && userToken && (
+              {!nodeLocation?.id && (
                 <Form
                   action={`${location.pathname}${location.search}`}
                   method="post"
@@ -334,7 +324,6 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
                   />
                   <input type="hidden" name="areaName" value={area.name} />
                   <input type="hidden" name="tileId" value={tile.id} />
-                  <input type="hidden" name="userToken" value={userToken} />
                   <TextInput
                     name="nodeId"
                     type="number"
@@ -344,11 +333,37 @@ export default function UpsertMarker({ area, tile }: UpsertMarkerProps) {
                     type="submit"
                     loading={transition.state !== "idle"}
                     variant="gradient"
+                    disabled={!user}
                   >
                     Add location
                   </Button>
                 </Form>
               )}
+              <div>
+                <Text size="xs" mt="xs">
+                  Join us in{" "}
+                  <Anchor
+                    size="xs"
+                    href="https://discord.com/invite/NTZu8Px"
+                    target="_blank"
+                    onClick={() =>
+                      trackOutboundLinkClick(
+                        "https://discord.com/invite/NTZu8Px"
+                      )
+                    }
+                    rel="noreferrer"
+                  >
+                    Discord
+                  </Anchor>{" "}
+                  to help maintaining nodes
+                </Text>
+                {!user && (
+                  <Text size="xs" color="orange">
+                    Sign in to add nodes without the need of reviews and to add
+                    additional locations.
+                  </Text>
+                )}
+              </div>
             </>
           )}
         </ScrollArea>
