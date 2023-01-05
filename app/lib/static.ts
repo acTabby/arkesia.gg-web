@@ -1,4 +1,4 @@
-import type { Continent, AreaNodeCategory, AreaNodeType, Area } from "./types";
+import type { Area, AreaNodeCategory, AreaNodeType, Continent } from "./types";
 
 export const ICON_BASE_URL =
   "https://wtudsavjhvtxvqitnoxr.supabase.co/storage/v1/object/public/cdn/icons/";
@@ -131,6 +131,16 @@ export const nodeCategories: AreaNodeCategory[] = [
       {
         name: "Rapport",
         icon: "minimap_symbol_84.webp",
+      },
+    ],
+  },
+  {
+    name: "Rapport Item",
+    includes: ["Continent", "Island"],
+    types: [
+      {
+        name: "Rapport Item",
+        icon: "rapport_item.webp",
       },
     ],
   },
