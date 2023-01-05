@@ -4,13 +4,12 @@ import useSupabase from "~/hooks/useSupabase";
 import { DiscordIcon } from "./DiscordIcon";
 
 export default function Login() {
-  const { supabase, session, user } = useSupabase();
+  const { supabase, session, user, isOverwolf } = useSupabase();
   const fetcher = useFetcher();
 
   const handleDiscordLogin = async () => {
-    if (window !== window.top && window.top) {
-      // Website is loaded in an iframe. Tell parent to open `/login`
-      window.top.postMessage({ provider: "discord" }, "*");
+    if (isOverwolf) {
+      window.top!.postMessage({ provider: "discord" }, "*");
 
       // Wait for login
       const handleMessage = (message: MessageEvent) => {

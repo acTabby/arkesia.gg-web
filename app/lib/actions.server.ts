@@ -1,8 +1,7 @@
 import type { AreaNode, AreaNodeLocation } from "@prisma/client";
 import type { ActionArgs, NodeOnDiskFile } from "@remix-run/node";
-import { unstable_parseMultipartFormData } from "@remix-run/node";
+import { json, unstable_parseMultipartFormData } from "@remix-run/node";
 import { badRequest } from "remix-utils";
-import { json } from "@remix-run/node";
 import {
   deleteNode,
   deleteNodeLocation,
@@ -13,28 +12,28 @@ import {
   insertNode,
   insertNodeLocation,
   updateNode,
-  updateNodeLocation,
+  updateNodeLocation
 } from "./db.server";
 import { postToDiscord } from "./discord";
 import {
   deleteNodeScreenshot,
   imageToWebp,
   uploadHandler,
-  uploadNodeScreenshot,
+  uploadNodeScreenshot
 } from "./storage.server";
+import { createServerClient, referrerIsOverwolf } from "./supabase.server";
 import type {
   CreateNodeForm,
   CreateNodeLocationForm,
-  UpdateNodeForm,
+  UpdateNodeForm
 } from "./types";
 import type {
   AreaNodeLocationWithoutId,
   AreaNodeWithoutId,
   FieldErrors,
-  PostNodeActionData,
+  PostNodeActionData
 } from "./validation";
 import { validateNode } from "./validation";
-import { createServerClient } from "./supabase.server";
 
 export function parseFormData<T extends {}>(
   body: FormData,
@@ -177,7 +176,8 @@ export async function requestVerifyNode(id: number, userId: number) {
 export const nodeAction = async ({ request }: ActionArgs) => {
   try {
     const response = new Response();
-    const supabase = createServerClient({ request, response });
+    const isOverwolf = referrerIsOverwolf(request);
+    const supabase = createServerClient({ request, response }, isOverwolf);
     const {
       data: { session },
     } = await supabase.auth.getSession();

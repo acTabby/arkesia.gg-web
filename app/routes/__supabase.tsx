@@ -6,12 +6,13 @@ import type { Session, SupabaseClient } from "@supabase/auth-helpers-remix";
 import { createBrowserClient } from "@supabase/auth-helpers-remix";
 import { useEffect, useState } from "react";
 import { findOrCreateUser } from "~/lib/db.server";
-import { createServerClient } from "~/lib/supabase.server";
+import { createServerClient, referrerIsOverwolf } from "~/lib/supabase.server";
 
 export type SupabaseContext = {
   supabase: SupabaseClient<any>;
   session: Session | null;
   user: User | null;
+  isOverwolf: boolean;
 };
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -21,8 +22,8 @@ export const loader = async ({ request }: LoaderArgs) => {
   };
 
   const response = new Response();
-
-  const supabase = createServerClient({ request, response });
+  const isOverwolf = referrerIsOverwolf(request);
+  const supabase = createServerClient({ request, response }, isOverwolf);
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -33,6 +34,7 @@ export const loader = async ({ request }: LoaderArgs) => {
       env,
       session,
       user,
+      isOverwolf,
     },
     {
       headers: response.headers,
@@ -41,10 +43,12 @@ export const loader = async ({ request }: LoaderArgs) => {
 };
 
 export default function Supabase() {
-  const { env, session, user } = useLoaderData<typeof loader>();
+  const { env, session, user, isOverwolf } = useLoaderData<typeof loader>();
   const fetcher = useFetcher();
   const [supabase] = useState(() =>
-    createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLIC_KEY)
+    createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLIC_KEY, {
+      cookieOptions: { sameSite: "none", secure: !isOverwolf },
+    })
   );
   const serverAccessToken = session?.access_token;
 
@@ -65,5 +69,5 @@ export default function Supabase() {
     };
   }, [serverAccessToken, supabase, fetcher]);
 
-  return <Outlet context={{ supabase, session, user }} />;
+  return <Outlet context={{ supabase, session, user, isOverwolf }} />;
 }
