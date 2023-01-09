@@ -86,10 +86,6 @@ type EditingNodeLocation = Partial<AreaNodeLocation> & {
 };
 
 type SessionStoreProps = {
-  selectedNodeLocation: AreaNodeLocationDTO | null | undefined;
-  setSelectedNodeLocation: (
-    selectedNodeLocation: AreaNodeLocationDTO | null
-  ) => void;
   editingNodeLocation: EditingNodeLocation | null;
   setEditingNodeLocation: (editingNode: EditingNodeLocation | null) => void;
 };
@@ -186,10 +182,6 @@ export const useSetFilters = () => {
 export const useSessionStore = create(
   persist<SessionStoreProps>(
     (set) => ({
-      selectedNodeLocation: undefined,
-      setSelectedNodeLocation: (
-        selectedNodeLocation: AreaNodeLocationDTO | null
-      ) => set({ selectedNodeLocation }),
       editingNodeLocation: null,
       setEditingNodeLocation: (
         editingNodeLocation: EditingNodeLocation | null
@@ -202,8 +194,6 @@ export const useSessionStore = create(
   )
 );
 
-const selectedNodeLocationSelector = (state: SessionStoreProps) =>
-  state.selectedNodeLocation;
 export const useSelectedNodeLocation = () => {
   const { nodeLocations = [] } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
@@ -220,18 +210,28 @@ export const useSelectedNodeLocation = () => {
         : nodeLocation.areaNodeId === nodeId,
     [nodeId, locationId]
   );
-
-  const selectedNodeLocation = useSessionStore(selectedNodeLocationSelector);
-  if (typeof selectedNodeLocation === "undefined") {
-    return (!hideDetails && nodeLocations.find(isSelectedLocation)) || null;
-  }
-  return selectedNodeLocation;
+  return (!hideDetails && nodeLocations.find(isSelectedLocation)) || null;
 };
 
-const setSelectedNodeLocationSelector = (state: SessionStoreProps) =>
-  state.setSelectedNodeLocation;
 export const useSetSelectedNodeLocation = () => {
-  return useSessionStore(setSelectedNodeLocationSelector);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const setSelectedNodeLocation = (
+    selectedNodeLocation: AreaNodeLocationDTO | null
+  ) => {
+    const newSearchParams: Parameters<typeof setSearchParams>[0] = {};
+    const tileId = searchParams.get("tileId");
+    if (tileId) {
+      newSearchParams.tileId = tileId;
+    }
+    if (selectedNodeLocation) {
+      newSearchParams.node = selectedNodeLocation.areaNodeId.toString();
+      newSearchParams.location = selectedNodeLocation.id.toString();
+    }
+    setSearchParams(newSearchParams);
+  };
+
+  return setSelectedNodeLocation;
 };
 
 const editingNodeLocationSelector = (state: SessionStoreProps) =>

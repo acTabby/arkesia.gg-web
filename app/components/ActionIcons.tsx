@@ -1,7 +1,7 @@
 import type { CSSObject } from "@mantine/core";
-import { Container } from "@mantine/core";
 import {
   ActionIcon,
+  Container,
   Dialog,
   Group,
   MediaQuery,
@@ -12,6 +12,7 @@ import {
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import { IconInfoCircle, IconMapPin, IconSettings } from "@tabler/icons";
 import { useState } from "react";
+import { ClientOnly } from "remix-utils";
 import {
   useDrawerPosition,
   useMap,
@@ -90,7 +91,7 @@ export default function ActionIcons() {
           <IconSettings color="#ced4da" width="100%" height="100%" />
         </ActionIcon>
       </Tooltip>
-      <User />
+      <ClientOnly>{() => <User />}</ClientOnly>
       <Dialog
         opened={openedSettings}
         withCloseButton
