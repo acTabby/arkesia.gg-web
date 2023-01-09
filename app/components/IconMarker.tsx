@@ -100,6 +100,7 @@ const IconMarker = forwardRef<L.Marker, IconMarkerProps>(
           zIndexOffset={highlight ? 1000 : zIndex}
           // @ts-ignore
           autoPanOnFocus={false}
+          opacity={opacity}
           {...props}
           ref={ref}
         />
@@ -109,6 +110,7 @@ const IconMarker = forwardRef<L.Marker, IconMarkerProps>(
             interactive={false}
             zIndexOffset={(highlight ? 1000 : zIndex) + 2}
             position={props.position}
+            opacity={opacity}
             // @ts-ignore
             autoPanOnFocus={false}
           />
