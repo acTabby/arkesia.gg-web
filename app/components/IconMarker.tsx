@@ -1,22 +1,28 @@
+import L from "leaflet";
+import { forwardRef } from "react";
 import type { MarkerProps } from "react-leaflet";
 import { Marker } from "react-leaflet";
 import { areaContinents, ICON_BASE_URL, nodeTypesMap } from "~/lib/static";
-import L from "leaflet";
-import { forwardRef } from "react";
-import type { AreaNodeType, TransitTo } from "~/lib/types";
 import { useMarkerSize, useShowNameOnMap } from "~/lib/store";
+import type { AreaNodeType, TransitTo } from "~/lib/types";
 
 let icons: {
   [path: string]: L.Icon;
 } = {};
 let lastMarkerSize: number | null = null;
-function getIcon(markerSize: number, type?: AreaNodeType, highlight?: boolean) {
+function getIcon(
+  markerSize: number,
+  type?: AreaNodeType,
+  highlight?: boolean,
+  unverified?: boolean
+) {
   if (lastMarkerSize !== markerSize) {
     icons = {};
     lastMarkerSize = markerSize;
   }
   const path = type ? type.icon : "unknown.webp";
-  const identifier = path + (highlight ? "-highlight" : "");
+  const identifier =
+    path + (highlight ? "-highlight" : "") + (unverified ? "-unverified" : "");
   if (!icons[identifier]) {
     const sizeMultiplicator = type?.sizeMultiplicator || 1;
     const iconSize: L.PointExpression =
@@ -29,7 +35,9 @@ function getIcon(markerSize: number, type?: AreaNodeType, highlight?: boolean) {
     icons[identifier] = L.icon({
       iconUrl: `${ICON_BASE_URL}${path}`,
       iconSize,
-      className: highlight ? "marker-highlight" : "",
+      className:
+        (highlight ? "marker-highlight " : "") +
+        (unverified ? "marker-unverified" : ""),
     });
   }
   return icons[identifier];
@@ -88,11 +96,10 @@ const IconMarker = forwardRef<L.Marker, IconMarkerProps>(
     return (
       <>
         <Marker
-          icon={getIcon(markerSize, areaNodeType, highlight)}
+          icon={getIcon(markerSize, areaNodeType, highlight, !verified)}
           zIndexOffset={highlight ? 1000 : zIndex}
           // @ts-ignore
           autoPanOnFocus={false}
-          opacity={verified ? opacity : 0.5}
           {...props}
           ref={ref}
         />
@@ -100,9 +107,8 @@ const IconMarker = forwardRef<L.Marker, IconMarkerProps>(
           <Marker
             icon={getLabel(name, type, transitTo, areaNodeType?.size)}
             interactive={false}
-            zIndexOffset={(highlight ? 1000 : zIndex) + 1}
+            zIndexOffset={(highlight ? 1000 : zIndex) + 2}
             position={props.position}
-            opacity={verified ? opacity : 0.5}
             // @ts-ignore
             autoPanOnFocus={false}
           />
