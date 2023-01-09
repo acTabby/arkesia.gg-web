@@ -10,13 +10,23 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useDidUpdate } from "@mantine/hooks";
+import { showNotification, updateNotification } from "@mantine/notifications";
 import {
   Form,
   useActionData,
   useLocation,
-  useSearchParams,
   useTransition,
 } from "@remix-run/react";
+import {
+  IconAlertTriangle,
+  IconCheck,
+  IconEye,
+  IconEyeOff,
+} from "@tabler/icons";
+import { useState } from "react";
+import { ClientOnly } from "remix-utils";
+import useSupabase from "~/hooks/useSupabase";
+import type { nodeAction } from "~/lib/actions.server";
 import {
   useDiscoveredNodes,
   useDrawerPosition,
@@ -28,20 +38,9 @@ import {
 } from "~/lib/store";
 import { AvailableNodes } from "./AvailableNodes";
 import ImagePreview from "./ImagePreview";
-import NodeDescription from "./NodeDescription";
-import { ClientOnly } from "remix-utils";
 import IslandGuideLink from "./IslandGuideLink";
+import NodeDescription from "./NodeDescription";
 import ShareButton from "./ShareButton";
-import type { nodeAction } from "~/lib/actions.server";
-import {
-  IconAlertTriangle,
-  IconCheck,
-  IconEye,
-  IconEyeOff,
-} from "@tabler/icons";
-import { showNotification, updateNotification } from "@mantine/notifications";
-import { useState } from "react";
-import useSupabase from "~/hooks/useSupabase";
 
 export default function NodeDetails() {
   const location = useLocation();
@@ -55,7 +54,6 @@ export default function NodeDetails() {
   const discoveredNodes = useDiscoveredNodes();
   const toggleDiscoveredNode = useToggleDiscoveredNode();
   const drawerPosition = useDrawerPosition();
-  const [searchParams, setSearchParams] = useSearchParams();
   const nodeLocation = useEditingNodeLocation();
   const [prevAction, setPrevAction] = useState<"delete" | "verify" | null>(
     null
@@ -108,19 +106,6 @@ export default function NodeDetails() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transition.state, actionData, transition.submission?.method]);
-
-  useDidUpdate(() => {
-    const newSearchParams: Parameters<typeof setSearchParams>[0] = {};
-    const tileId = searchParams.get("tileId");
-    if (tileId) {
-      newSearchParams.tileId = tileId;
-    }
-    if (selectedNodeLocation) {
-      newSearchParams.node = selectedNodeLocation.areaNodeId.toString();
-      newSearchParams.location = selectedNodeLocation.id.toString();
-    }
-    setSearchParams(newSearchParams);
-  }, [selectedNodeLocation]);
 
   return (
     <Drawer

@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import type { AreaNodeLocationDTO, Tile } from "~/lib/types";
+import { useDidUpdate } from "@mantine/hooks";
+import { useLoaderData, useParams, useSearchParams } from "@remix-run/react";
 import L from "leaflet";
 import "leaflet-rotate";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { MapContainer, useMapEvents } from "react-leaflet";
-import includeCanvasTileLayer from "./includeCanvasTileLayer";
-import TileControl from "./TileControl";
 import { getBounds, getMapCenter } from "~/lib/map";
-import UpsertMarker from "./UpsertMarker";
-import { useDidUpdate } from "@mantine/hooks";
+import { arkesiaArea, continents } from "~/lib/static";
 import {
   useLastAreaNames,
   useMap,
@@ -16,9 +14,11 @@ import {
   useSetMap,
   useSetSelectedNodeLocation,
 } from "~/lib/store";
-import { arkesiaArea, continents } from "~/lib/static";
-import { useLoaderData, useParams, useSearchParams } from "@remix-run/react";
+import type { AreaNodeLocationDTO, Tile } from "~/lib/types";
 import type { loader } from "~/routes/__supabase/$continent.$area";
+import includeCanvasTileLayer from "./includeCanvasTileLayer";
+import TileControl from "./TileControl";
+import UpsertMarker from "./UpsertMarker";
 
 includeCanvasTileLayer();
 
