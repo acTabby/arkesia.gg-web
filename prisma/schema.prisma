@@ -26,6 +26,8 @@ model User {
   token       String     @unique
   nodes       AreaNode[]
   isModerator Boolean
+  supporterId Int?       @unique
+  supporter   Supporter? @relation(fields: [supporterId], references: [id])
 
   @@index([token])
 }
@@ -39,4 +41,12 @@ model AreaNodeLocation {
   position   Float[]
 
   @@index([areaName])
+}
+
+model Supporter {
+  id       Int    @id @default(autoincrement())
+  patronId String
+  secret   String
+
+  User User?
 }

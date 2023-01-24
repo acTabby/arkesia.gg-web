@@ -21,7 +21,6 @@ import Login from "./Login";
 export default function User() {
   const [opened, setOpened] = useState(false);
   const { user } = useSupabase();
-
   return (
     <Popover
       width={300}
