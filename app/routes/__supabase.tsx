@@ -5,13 +5,15 @@ import { Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import type { Session, SupabaseClient } from "@supabase/auth-helpers-remix";
 import { createBrowserClient } from "@supabase/auth-helpers-remix";
 import { useEffect, useState } from "react";
-import { findOrCreateUser } from "~/lib/db.server";
+import { db, findOrCreateUser } from "~/lib/db.server";
 import { createServerClient, referrerIsOverwolf } from "~/lib/supabase.server";
+import { isPatron } from "~/lib/supporters";
 
 export type SupabaseContext = {
   supabase: SupabaseClient<any>;
   session: Session | null;
   user: User | null;
+  isSupporter: boolean;
   isOverwolf: boolean;
 };
 
@@ -28,6 +30,15 @@ export const loader = async ({ request }: LoaderArgs) => {
     data: { session },
   } = await supabase.auth.getSession();
   const user = session && (await findOrCreateUser(session.user.id));
+  let isSupporter = false;
+  if (user?.supporterId) {
+    const supporter = await db.supporter.findFirst({
+      where: { id: user.supporterId },
+    });
+    if (supporter) {
+      isSupporter = await isPatron(supporter.patronId);
+    }
+  }
 
   return json(
     {
@@ -35,6 +46,7 @@ export const loader = async ({ request }: LoaderArgs) => {
       session,
       user,
       isOverwolf,
+      isSupporter,
     },
     {
       headers: response.headers,
@@ -43,7 +55,8 @@ export const loader = async ({ request }: LoaderArgs) => {
 };
 
 export default function Supabase() {
-  const { env, session, user, isOverwolf } = useLoaderData<typeof loader>();
+  const { env, session, user, isOverwolf, isSupporter } =
+    useLoaderData<typeof loader>();
   const fetcher = useFetcher();
   const [supabase] = useState(() =>
     createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLIC_KEY, {
@@ -69,5 +82,7 @@ export default function Supabase() {
     };
   }, [serverAccessToken, supabase, fetcher]);
 
-  return <Outlet context={{ supabase, session, user, isOverwolf }} />;
+  return (
+    <Outlet context={{ supabase, session, user, isOverwolf, isSupporter }} />
+  );
 }

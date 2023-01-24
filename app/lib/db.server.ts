@@ -1,4 +1,4 @@
-import type { AreaNode, AreaNodeLocation, Prisma } from "@prisma/client";
+import type { AreaNode, AreaNodeLocation, Prisma, User } from "@prisma/client";
 import { PrismaClient } from "@prisma/client";
 import type { AreaNodeLocationDTO } from "./types";
 import type {
@@ -126,6 +126,14 @@ export const deleteNodeLocation = async (nodeLocationId: number) => {
 
 export const findUser = async (token: string) => {
   const user = await db.user.findFirst({ where: { token } });
+  return user;
+};
+
+export const updateUser = async (userId: string, data: Partial<User>) => {
+  const user = await db.user.update({
+    where: { token: userId },
+    data,
+  });
   return user;
 };
 

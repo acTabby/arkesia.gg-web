@@ -2,6 +2,7 @@ import { Button, Group, Text } from "@mantine/core";
 import { useFetcher } from "@remix-run/react";
 import useSupabase from "~/hooks/useSupabase";
 import { DiscordIcon } from "./DiscordIcon";
+import SupporterInput from "./SupporterInput";
 
 export default function Login() {
   const { supabase, session, user, isOverwolf } = useSupabase();
@@ -38,26 +39,31 @@ export default function Login() {
     }
   };
 
-  return session ? (
+  return (
     <>
-      <Text align="center" color="dimmed" size="sm">
-        User ID: {user?.id}
-        <br />
-        Role: {user?.isModerator ? "Moderator" : "User"}
-      </Text>
-      <Button onClick={handleLogout}>Logout</Button>
-    </>
-  ) : (
-    <>
-      <Text align="center" color="dimmed" size="sm">
-        For some features like creating and reporting nodes, an account is
-        required. Please sign in:
-      </Text>
-      <Group grow>
-        <Button onClick={handleDiscordLogin} leftIcon={<DiscordIcon />}>
-          Discord login
-        </Button>
-      </Group>
+      {session ? (
+        <>
+          <Text align="center" color="dimmed" size="sm">
+            User ID: {user?.id}
+            <br />
+            Role: {user?.isModerator ? "Moderator" : "User"}
+          </Text>
+          <Button onClick={handleLogout}>Logout</Button>
+        </>
+      ) : (
+        <>
+          <Text align="center" color="dimmed" size="sm">
+            For some features like removing ads, creating and reporting nodes,
+            an account is required. Please sign in:
+          </Text>
+          <Group grow>
+            <Button onClick={handleDiscordLogin} leftIcon={<DiscordIcon />}>
+              Discord login
+            </Button>
+          </Group>
+        </>
+      )}
+      <SupporterInput />
     </>
   );
 }

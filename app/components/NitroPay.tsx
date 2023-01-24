@@ -1,9 +1,16 @@
 import { Box } from "@mantine/core";
 import { useEffect } from "react";
+import useSupabase from "~/hooks/useSupabase";
 
 const NitroPay = () => {
+  const { isSupporter } = useSupabase();
+
   useEffect(() => {
-    if (navigator.userAgent.includes("Overwolf")) {
+    window.top?.postMessage({ isSupporter }, "*");
+  }, [isSupporter]);
+
+  useEffect(() => {
+    if (navigator.userAgent.includes("Overwolf") || isSupporter) {
       return;
     }
 
@@ -34,8 +41,11 @@ const NitroPay = () => {
         float: "always",
       },
     });
-  }, []);
+  }, [isSupporter]);
 
+  if (isSupporter) {
+    return <></>;
+  }
   return (
     <Box
       id="nitro"
