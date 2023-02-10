@@ -93,7 +93,15 @@ export default function User() {
           <Group spacing="xs" position="center">
             <Anchor
               size="xs"
-              href="https://www.aeternum-map.gg/"
+              href="https://www.hogwarts.gg/"
+              title="Hogwarts Legacy Fansite"
+              target="_blank"
+            >
+              Hogwarts.gg
+            </Anchor>
+            <Anchor
+              size="xs"
+              href="https://aeternum-map.gg/"
               title="Interactive map for New World"
               target="_blank"
             >

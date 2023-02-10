@@ -22,7 +22,19 @@ const Footer = () => {
     >
       <Group spacing={2}>
         <Anchor
-          href="https://www.aeternum-map.gg/"
+          sx={{
+            color: "#ddd",
+          }}
+          size="xs"
+          href="https://www.hogwarts.gg/"
+          title="Hogwarts Legacy Fansite"
+          target="_blank"
+        >
+          Hogwarts.gg
+        </Anchor>
+        <Text size="xs">|</Text>
+        <Anchor
+          href="https://aeternum-map.gg/"
           sx={{
             color: "#ddd",
           }}
