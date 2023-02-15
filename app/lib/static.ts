@@ -7650,6 +7650,47 @@ export const continents: Continent[] = [
       },
     ],
   },
+  {
+    name: "Rowen",
+    areas: [
+      {
+        name: "Fang River",
+        category: "Continent",
+        tiles: [
+          {
+            id: 3,
+            tile: "fang_river/lv_low_rmolor_f_ps_0_{y}x{x}.png.webp",
+            full: "fang_river/lv_low_rmolor_f_ps_0_full.png.webp",
+            max: [8, 7],
+          },
+        ],
+      },
+      {
+        name: "The Wolflands",
+        category: "Continent",
+        tiles: [
+          {
+            id: 3,
+            tile: "the_wolflands/lv_low_lcwolf_f_ps_0_{y}x{x}.png.webp",
+            full: "the_wolflands/lv_low_lcwolf_f_ps_0_full.png.webp",
+            max: [4, 10],
+          },
+        ],
+      },
+      {
+        name: "The Regarbank Great Plains",
+        category: "Continent",
+        tiles: [
+          {
+            id: 3,
+            tile: "the_regarbank_great_plains/lv_low_lgplain_f_ps_0_{y}x{x}.png.webp",
+            full: "the_regarbank_great_plains/lv_low_lgplain_f_ps_0_full.png.webp",
+            max: [7, 10],
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export const areaContinents: {
