@@ -1060,7 +1060,7 @@ export const nodeCategories: AreaNodeCategory[] = [
         icon: "minimap_symbol_109.webp",
       },
       {
-        name: "Sea Bounty - See?",
+        name: "Sea Bounty - Forgotten Lake",
         icon: "minimap_symbol_110.webp",
       },
       {
@@ -1136,7 +1136,7 @@ export const nodeCategories: AreaNodeCategory[] = [
         icon: "minimap_symbol_128.webp",
       },
       {
-        name: "Sea Bounty - The Hestia",
+        name: "Sea Bounty - Shipwreck Scrap",
         icon: "minimap_symbol_129.webp",
       },
       {
@@ -1160,7 +1160,7 @@ export const nodeCategories: AreaNodeCategory[] = [
         icon: "minimap_symbol_134.webp",
       },
       {
-        name: "Sea Bounty - Forgotten Lake",
+        name: "Sea Bounty - Hestia",
         icon: "minimap_symbol_135.webp",
       },
       {
