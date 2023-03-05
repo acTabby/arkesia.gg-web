@@ -1056,7 +1056,7 @@ export const nodeCategories: AreaNodeCategory[] = [
         icon: "minimap_symbol_108.webp",
       },
       {
-        name: "Sea Bounty - Eagle?",
+        name: "Sea Bounty - Ancient Gold Coin",
         icon: "minimap_symbol_109.webp",
       },
       {
