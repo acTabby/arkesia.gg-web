@@ -1181,20 +1181,20 @@ export const nodeCategories: AreaNodeCategory[] = [
       },
       {
         name: "Sea Bounty - Ice Statue of a Woman",
-        icon: "minimap_symbol_1_326.webp",      
-       },
+        icon: "minimap_symbol_1_326.webp",
+      },
       {
         name: "Sea Bounty - Deep Sea Boulder",
         icon: "minimap_symbol_121.webp",
-         },
+      },
       {
         name: "Sea Bounty - Eye of the Dead",
         icon: "minimap_symbol_121.webp",
-         },
+      },
       {
         name: "Sea Bounty - Eye of the South Sea",
         icon: "minimap_symbol_121.webp",
-         },
+      },
       {
         name: "Sea Bounty - Eye of the North Sea",
         icon: "minimap_symbol_121.webp",
